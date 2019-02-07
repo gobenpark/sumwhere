@@ -1,0 +1,30 @@
+language: go
+
+env:
+  global:
+    - CC_TEST_REPORTER_ID=71266456503f8f3caaae69674d933342c3fce1e2cced98834a2820bfcd6ebe01
+    - GO111MODULE=on
+    - CODECOV_TOKEN=f4fddcbc-32a4-4c55-94fc-f6b04ddc5e18
+
+services:
+  - docker
+
+os:
+  - linux
+
+go:
+  - 1.11.x
+
+before_script:
+  - make clean
+
+script:
+  - go test -race -coverprofile=coverage.txt -covermode=atomic
+  - make sumwhere
+
+after_script:
+  - mv coverage.txt c.out
+  - ./cc-test-reporter after-build
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

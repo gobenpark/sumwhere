@@ -1,6 +1,10 @@
 package main
 
-import "sumwhere/app"
+import (
+	"sumwhere/app"
+)
+
+var ServiceVersion string
 
 func main() {
 	application := app.NewApp()
