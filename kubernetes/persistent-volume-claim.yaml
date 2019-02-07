@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-data
+  namespace: sumwhere
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: "slow"
+  resources:
+    requests:
+      storage: 1.8Ti
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  namespace: sumwhere
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: "slow"
+  resources:
+    requests:
+      storage: 100Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: static-pvc
+  namespace: sumwhere
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: "slow"
+  resources:
+    requests:
+      storage: 800Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: image-pvc
+  namespace: sumwhere
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: "slow"
+  resources:
+    requests:
+      storage: 800Gi

@@ -1,0 +1,32 @@
+
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: qjadn0914@naver.com
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    # Enable HTTP01 validations
+    http01: {}
+---
+apiVersion: certificates.k8s.io/v1alpha1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: qjadn0914@naver.com
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    http01: {}
+
+
+
+# staging 테스트후 letsencrypt-tls secret 삭제후 prod 진행

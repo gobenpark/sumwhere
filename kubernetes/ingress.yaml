@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: sumwhere-ingress
+  namespace: sumwhere
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size : 100m
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    certmanager.k8s.io/acme-challenge-type: http01
+    nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
+spec:
+  tls:
+  - secretName: letsencrypt-tls
+    hosts:
+    - www.sumwhere.kr
+    - rabbitmq.sumwhere.kr
+  rules:
+    - host: www.sumwhere.kr
+      http:
+        paths:
+        - backend:
+            serviceName: sumwhere-svc
+            servicePort: 80
+    - host: rabbitmq.sumwhere.kr
+      http:
+        paths:
+        - backend:
+           serviceName: rabbitmq-svc
+           servicePort: 15672

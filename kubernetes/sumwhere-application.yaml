@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sumwhere-server
+  namespace: sumwhere
+
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sumwhere-server
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  revisionHistoryLimit: 10
+  template:
+    metadata:
+      labels:
+        app: sumwhere-server
+    spec:
+      containers:
+      - name: sumwhere-server
+        image: qkrqjadn/sumwhere:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: RELEASE_SYSTEM
+          value: "kubernetes"
+        - name: DATABASE_USER
+          value: "root"
+        - name: DATABASE_DRIVER
+          value: "mysql"
+        - name: DATABASE_PASS
+          value: "1q2w3e4r"
+        - name: DATABASE_NAME
+          value: "sumwhere"
+        volumeMounts:
+          - mountPath: /static
+            name: staticvolume
+          - mountPath: /images
+            name: imagevolume
+          - mountPath: /config
+            name: firebase
+
+      volumes:
+        - name: staticvolume
+          persistentVolumeClaim:
+            claimName: static-pvc
+        - name: imagevolume
+          persistentVolumeClaim:
+            claimName: image-pvc
+        - name: firebase
+          configMap:
+            name: firebase-json
+            defaultMode: 0755
+
+      imagePullSecrets:
+        - name: regcred
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sumwhere-svc
+  namespace: sumwhere
+spec:
+  selector:
+    app: sumwhere-server
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
