@@ -73,10 +73,12 @@ func (s Sumwhere) Run() error {
 }
 
 func (s Sumwhere) setMiddleWare() error {
-	if os.Getenv("RELEASE_SYSTEM") == "kubernetes" {
+
+	switch os.Getenv("RELEASE_SYSTEM") {
+	case "kubernetes":
 		s.Static("/images", "/images")
 		s.Use(middlewares.ContextRedis(middlewares.ContextGetRedisName, initGetRedis()))
-	} else {
+	default:
 		s.Static("/images", "images")
 	}
 
@@ -123,8 +125,6 @@ func initDB() (*xorm.Engine, error) {
 	dbName := os.Getenv("DATABASE_NAME")
 
 	switch os.Getenv("RELEASE_SYSTEM") {
-	case "docker":
-		url = fmt.Sprintf("%s:%s@tcp(mysql:3306)/%s", dbUser, dbPass, dbName)
 	case "kubernetes":
 		url = fmt.Sprintf("%s:%s@tcp(mysql-svc.sumwhere:3306)/%s", dbUser, dbPass, dbName)
 	default:
