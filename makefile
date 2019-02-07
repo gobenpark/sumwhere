@@ -11,19 +11,18 @@ DATETIME:=$$(date "+%Y%m%d-%H%M%S")
 VERSIONS:=$(VERSION).$(GITCOMMITCOUNT)-$(GITHASH)-$(DATETIME)
 #https://codecov.io/
 
-.PHONY: clean build-docker rolling-update sumwhere
+.PHONY: clean docker-build rolling-update sumwhere
 
 clean:
 	$(GOCLEAN)
 
-sumwhere: clean
+sumwhere:
 	@GOOS=linux GOARCH=amd64 CGO_ENABLED=0 $(GOBUILD) -o $@ -ldflags "-X main.ServiceVersion=$(VERSIONS)" *.go
 
-build-docker: build-alpine
-	@docker build -t $(IMAGE):$(TAG) .
-	@docker push $(IMAGE):$(TAG)
+docker-build:
+	@docker build -t $(IMAGE):$(VERSIONS) .
 
-rolling-update: build-docker
+rolling-update:
 	@ssh root@202.30.23.76 -p 55555 kubectl set image deployment/sumwhere-server sumwhere-server=$(IMAGE):$(TAG) -n sumwhere
 
 push:
