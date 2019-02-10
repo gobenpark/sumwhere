@@ -79,7 +79,7 @@ func (s Sumwhere) setMiddleWare() error {
 		s.Static("/images", "/images")
 		s.Use(middlewares.ContextRedis(middlewares.ContextGetRedisName, initGetRedis()))
 	default:
-		s.Static("/images", "images")
+		break
 	}
 
 	db, err := initDB()
@@ -129,7 +129,7 @@ func initDB() (*xorm.Engine, error) {
 		url = fmt.Sprintf("%s:%s@tcp(mysql-svc.sumwhere:3306)/%s", dbUser, dbPass, dbName)
 	default:
 		database = "mysql"
-		url = fmt.Sprintf("%s:%s@tcp(202.30.23.76:33060)/%s", "root", "1q2w3e4r", "sumwhere")
+		url = fmt.Sprintf("%s:%s@tcp(192.168.0.192:3306)/%s", "root", "1q2w3e4r", "sumwhere")
 	}
 
 	db, err := xorm.NewEngine(database, url)
@@ -153,7 +153,7 @@ func initDB() (*xorm.Engine, error) {
 		new(models.Banner),
 		new(models.PurchaseProduct),
 		new(models.PurchaseHistory),
-		new(models.TripPlaceType),
+		new(models.TripPlace),
 		new(models.Event),
 		new(models.Advertisement),
 		new(models.Notice),
@@ -162,6 +162,7 @@ func initDB() (*xorm.Engine, error) {
 		new(models.Push),
 		new(models.PushHistory),
 		new(models.MatchType),
+		new(models.Country),
 	)
 
 	return db, nil

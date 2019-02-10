@@ -19,8 +19,8 @@ func (TripUserGroup) TableName() string {
 }
 
 type TripGroup struct {
-	Trip          `json:"trip" xorm:"extends"`
-	TripPlaceType `json:"tripType" xorm:"extends"`
+	Trip      `json:"trip" xorm:"extends"`
+	TripPlace `json:"tripType" xorm:"extends"`
 }
 
 func (TripGroup) TableName() string {
@@ -76,7 +76,7 @@ func (Trip) Get(ctx context.Context, tripId, userId int64) (*Trip, error) {
 
 func (TripGroup) GetMyTrip(ctx context.Context, id int64) (*TripGroup, error) {
 	var item TripGroup
-	result, err := factory.DB(ctx).Where("user_id = ?", id).Join("INNER", "trip_place_type", "trip_place_type.id = trip.triptype_id").Get(&item)
+	result, err := factory.DB(ctx).Where("user_id = ?", id).Join("INNER", "trip_place", "trip_place.id = trip.triptype_id").Get(&item)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (TripGroup) GetMyTrip(ctx context.Context, id int64) (*TripGroup, error) {
 func (TripGroup) GetAll(ctx context.Context, sortby, order []string, offset, limit int) (totalCount int64, items []TripGroup, err error) {
 
 	queryBuilder := func() xorm.Interface {
-		q := factory.DB(ctx).Join("INNER", "trip_place_type", "trip_place_type.id = trip.triptype_id")
+		q := factory.DB(ctx).Join("INNER", "trip_place", "trip_place.id = trip.triptype_id")
 		if err := setSortOrder(q, sortby, order); err != nil {
 			factory.Logger(ctx).Error(err)
 		}
