@@ -25,9 +25,4 @@ script:
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - make push
-
-deploy:
-  provider: script
-  script: make rolling-update
-  on:
-    branch: master
+  - make rolling-update
