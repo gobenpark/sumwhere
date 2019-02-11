@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/asaskevich/govalidator"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/go-redis/redis"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
 	"github.com/labstack/echo"
@@ -13,6 +14,8 @@ import (
 	"sumwhere/models"
 	"time"
 )
+
+const TOKEN string = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiZW1haWwiOiIiLCJhZG1pbiI6ZmFsc2UsImV4cCI6MTU3OTE1MTAxOX0.huD7yQUMvbTAcRyh9oKvayPGDsN4lzLWuiST4S-IJe4"
 
 var (
 	echoApp          *echo.Echo
@@ -25,7 +28,18 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	_ = xormEngine.Sync(new(models.Banner))
+
+	opt, err := redis.ParseURL("redis://:@1.215.236.26:53379")
+	if err != nil {
+		panic(err)
+	}
+	rclient := redis.NewClient(opt)
+
+	_ = xormEngine.Sync(new(models.Banner),
+		new(models.Country),
+		new(models.Advertisement),
+		new(models.Notice),
+		new(models.Event))
 
 	echoApp = echo.New()
 	echoApp.Validator = &Validator{}
@@ -41,8 +55,10 @@ func init() {
 		},
 	})
 
+	redisClient := middlewares.ContextRedis("test", rclient)
+
 	handleWithFilter = func(handlerFunc echo.HandlerFunc, c echo.Context) error {
-		return token(db(handlerFunc))(c)
+		return redisClient(token(db(handlerFunc)))(c)
 	}
 }
 

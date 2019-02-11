@@ -32,6 +32,7 @@ func (m MatchController) Init(g *echo.Group) {
 	g.GET("/match/receive", m.MatchReceive)
 	g.GET("/match/send", m.MatchSend)
 	g.GET("/match/type", m.GetMatchTypes)
+	g.GET("/match/totalcount", m.GetTotalCount)
 }
 
 func (MatchController) MatchListFromMysql(e echo.Context, userID int64, trip *models.Trip, count int) ([]models.TripUserGroup, error) {
@@ -288,4 +289,15 @@ func (MatchController) GetMatchTypes(e echo.Context) error {
 		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
 	}
 	return utils.ReturnApiSucc(e, http.StatusOK, types)
+}
+
+func (MatchController) GetTotalCount(e echo.Context) error {
+	count, err := models.Match{}.TotalCount(e.Request().Context())
+	if err != nil {
+		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
+	}
+	if count < 30 {
+		return utils.ReturnApiSucc(e, http.StatusOK, 30)
+	}
+	return utils.ReturnApiSucc(e, http.StatusOK, count)
 }

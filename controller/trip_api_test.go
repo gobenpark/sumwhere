@@ -18,7 +18,7 @@ var resultJson = `{"result":{"concept":" 명소 바꾸기 "},"success":true,"err
 func TestTripController_Update(t *testing.T) {
 	req := httptest.NewRequest(echo.PATCH, "/trip", strings.NewReader(userJson))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	req.Header.Set(echo.HeaderAuthorization, "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiZW1haWwiOiIiLCJhZG1pbiI6ZmFsc2UsImV4cCI6MTU3OTE1MTAxOX0.huD7yQUMvbTAcRyh9oKvayPGDsN4lzLWuiST4S-IJe4")
+	req.Header.Set(echo.HeaderAuthorization, TOKEN)
 	rec := httptest.NewRecorder()
 	ctx := echoApp.NewContext(req, rec)
 	ctx.SetParamNames("id")
@@ -33,4 +33,40 @@ func TestTripController_Update(t *testing.T) {
 
 	require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &v))
 	require.Equal(t, true, v.Success)
+}
+
+func TestTripController_GetTripPlace(t *testing.T) {
+	req := httptest.NewRequest(echo.GET, "/trip", nil)
+	req.Header.Set(echo.HeaderAuthorization, TOKEN)
+	rec := httptest.NewRecorder()
+	ctx := echoApp.NewContext(req, rec)
+	ctx.SetParamNames("countryid")
+	ctx.SetParamValues("1")
+	assert.NoError(t, handleWithFilter(TripController{}.GetMyTrip, ctx))
+	assert.Equal(t, http.StatusOK, rec.Code)
+
+	var v struct {
+		Result  []models.TripPlace `json:"result"`
+		Success bool               `json:"success"`
+	}
+
+	assert.NoError(t, json.Unmarshal(rec.Body.Bytes(), &v))
+	assert.Equal(t, true, v.Success)
+	t.Log(v.Result)
+}
+
+func TestTripController_GetTripCountry(t *testing.T) {
+	req := httptest.NewRequest(echo.GET, "/trip/country", nil)
+	req.Header.Set(echo.HeaderAuthorization, TOKEN)
+	rec := httptest.NewRecorder()
+	ctx := echoApp.NewContext(req, rec)
+	assert.NoError(t, handleWithFilter(TripController{}.GetTripCountry, ctx))
+	assert.Equal(t, http.StatusOK, rec.Code)
+
+	var v struct {
+		Result  []models.Country `json:"result"`
+		Success bool             `json:"success"`
+	}
+	assert.NoError(t, json.Unmarshal(rec.Body.Bytes(), &v))
+	assert.Equal(t, true, v.Success)
 }

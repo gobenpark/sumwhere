@@ -25,6 +25,10 @@ func (m *Match) Update(ctx context.Context) (int64, error) {
 	return factory.DB(ctx).ID(m.Id).Update(m)
 }
 
+func (Match) TotalCount(ctx context.Context) (int64, error) {
+	return factory.DB(ctx).Count(Match{})
+}
+
 func (Match) GetAll(ctx context.Context, sortby, order []string, offset, limit int) (totalCount int64, items []Match, err error) {
 	queryBuilder := func() xorm.Interface {
 		q := factory.DB(ctx)

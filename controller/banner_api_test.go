@@ -13,6 +13,7 @@ import (
 
 func TestBannerController_GetBanner(t *testing.T) {
 	req := httptest.NewRequest(echo.GET, "/banner", nil)
+	req.Header.Set(echo.HeaderAuthorization, TOKEN)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	ctx := echoApp.NewContext(req, rec)

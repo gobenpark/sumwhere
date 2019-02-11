@@ -9,13 +9,13 @@ import (
 const (
 	ContextGetRedisName = "GETREDIS"
 	ContextSetRedisName = "SETREDIS"
-
 	/* Redis Keys */
-
 	// 무료 매칭 가능  2회 Zincrby
 	FREEMATCH_COUNT = "freematch"
 
 	MATCH_RECOMMAND = "matchRecommand"
+
+	TOTALMATCHCOUNT = "totalmatchcount"
 )
 
 func ContextRedis(service string, client *redis.Client) echo.MiddlewareFunc {
