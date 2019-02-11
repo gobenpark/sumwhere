@@ -21,7 +21,7 @@ script:
   - go test -race -coverprofile=coverage.txt -covermode=atomic $(go list ./...)
   - make sumwhere
   - make docker-build
-  -
+
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
