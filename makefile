@@ -7,7 +7,7 @@ DOCKER_USERNAME=qkrqjadn
 VERSION=1.0
 GITCOMMITCOUNT:=$$(git rev-list HEAD | wc -l | tr -d ' ')
 GITHASH:=$$(git rev-parse --short HEAD)
-DATETIME:=$$(date "+%Y%m%d-%H%M%S")
+DATETIME:=$$(date "+%Y%m%d")
 VERSIONS:=$(VERSION).$(GITCOMMITCOUNT)-$(GITHASH)-$(DATETIME)
 #https://codecov.io/
 .PHONY: clean docker-build rolling-update sumwhere test
