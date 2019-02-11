@@ -55,7 +55,7 @@ func init() {
 		},
 	})
 
-	redisClient := middlewares.ContextRedis("test", rclient)
+	redisClient := middlewares.ContextRedis(middlewares.ContextSetRedisName, rclient)
 
 	handleWithFilter = func(handlerFunc echo.HandlerFunc, c echo.Context) error {
 		return redisClient(token(db(handlerFunc)))(c)

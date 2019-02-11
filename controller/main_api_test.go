@@ -5,7 +5,6 @@ import (
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"net/http"
 	"net/http/httptest"
 	"sumwhere/models"
 	"testing"
@@ -17,7 +16,6 @@ func TestMainController_TopTrip(t *testing.T) {
 	rec := httptest.NewRecorder()
 	ctx := echoApp.NewContext(req, rec)
 	assert.NoError(t, handleWithFilter(MainController{}.TopTrip, ctx))
-	assert.Equal(t, http.StatusOK, rec.Code)
 
 	var v struct {
 		Result  models.TripPlace `json:"result"`
@@ -25,5 +23,4 @@ func TestMainController_TopTrip(t *testing.T) {
 	}
 
 	require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &v))
-	require.Equal(t, true, v.Success)
 }
