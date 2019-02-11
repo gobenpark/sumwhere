@@ -15,7 +15,7 @@ func (m MainController) Init(g *echo.Group) {
 }
 
 func (MainController) TopTrip(e echo.Context) error {
-	trips, err := models.TripPlaceType{}.TopTripPlaces(e.Request().Context())
+	trips, err := models.TripPlace{}.TopTripPlaces(e.Request().Context())
 	if err != nil {
 		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorNotFound, err)
 	}
