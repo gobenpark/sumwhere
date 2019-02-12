@@ -21,8 +21,7 @@ script:
 after_success:
 - bash <(curl -s https://codecov.io/bash)
 - make push
-- make rolling-update
--
+
 before_install:
 - openssl aes-256-cbc -K $encrypted_bd9b1f80d656_key -iv $encrypted_bd9b1f80d656_iv
   -in travis_deploy_keys.enc -out ./travis_deploy_keys -d
@@ -30,5 +29,10 @@ before_install:
 - chmod 600 ./travis_deploy_keys
 - echo -e "Host 210.100.177.146\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 - ssh-add ./travis_deploy_keys
-- ssh -i ./travis_deploy_keys root@210.100.177.146 -p 55555 pwd
 
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: make rolling-update
+  on:
+    branch: master
