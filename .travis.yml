@@ -1,28 +1,30 @@
 language: go
-
 env:
   global:
-    - GO111MODULE=on
-    - CODECOV_TOKEN=f4fddcbc-32a4-4c55-94fc-f6b04ddc5e18
-
+  - GO111MODULE=on
+  - CODECOV_TOKEN=f4fddcbc-32a4-4c55-94fc-f6b04ddc5e18
+  - SERVER_IP_ADDRESS=210.100.177.146
 services:
-  - docker
-
+- docker
 os:
-  - linux
-
+- linux
 go:
-  - 1.11.x
-
+- 1.11.x
 before_script:
-  - make clean
-
+- make clean
 script:
-  - go test -race -coverprofile=coverage.txt -covermode=atomic $(go list ./...)
-  - make sumwhere
-  - make docker-build
-
+- go test -race -coverprofile=coverage.txt -covermode=atomic $(go list ./...)
+- make sumwhere
+- make docker-build
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
-  - make push
-  - make rolling-update
+- bash <(curl -s https://codecov.io/bash)
+- make push
+- make rolling-update
+before_install:
+- openssl aes-256-cbc -K $encrypted_bd9b1f80d656_key -iv $encrypted_bd9b1f80d656_iv
+  -in travis_deploy_keys.enc -out ./travis_deploy_keys -d
+- eval "$(ssh-agent -s)"
+- chmod 600 ./travis_deploy_keys
+- ssh-add ./travis_deploy_keys
+- ssh -i ./travis_deploy_keys root@$(SERVER_IP_ADDRESS) -p 55555 pwd
+

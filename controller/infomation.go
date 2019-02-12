@@ -32,5 +32,5 @@ func (InfomationController) GetEvent(e echo.Context) error {
 }
 
 func (InfomationController) GetAdvertisement(e echo.Context) error {
-	return nil
+	return utils.ReturnApiSucc(e, http.StatusOK, []models.Advertisement{})
 }

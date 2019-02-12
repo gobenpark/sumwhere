@@ -86,3 +86,4 @@ test/user_test.go
 vendor/github.com/pmezard/
 vendor/github.com/streadway/
 vendor/github.com/stretchr/
+travis_deploy_keys
