@@ -3,7 +3,7 @@ env:
   global:
   - GO111MODULE=on
   - CODECOV_TOKEN=f4fddcbc-32a4-4c55-94fc-f6b04ddc5e18
-  - SERVER_IP_ADDRESS=210.100.177.146
+
 services:
 - docker
 os:
@@ -29,5 +29,5 @@ before_install:
 - eval "$(ssh-agent -s)"
 - chmod 600 ./travis_deploy_keys
 - ssh-add ./travis_deploy_keys
-- ssh -i ./travis_deploy_keys root@$(SERVER_IP_ADDRESS) -p 55555 pwd
+- ssh -i ./travis_deploy_keys root@210.100.177.146 -p 55555 pwd
 
