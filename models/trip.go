@@ -31,9 +31,10 @@ type Trip struct {
 	Id          int64     `json:"id" xorm:"id pk autoincr"`
 	UserId      int64     `json:"userId" xorm:"user_id" valid:"required"`
 	MatchTypeId int64     `json:"matchTypeId" xorm:"match_type_id"`
-	Concept     string    `json:"concept" xorm:"concept not null"`
 	TripTypeId  int64     `json:"tripTypeId" xorm:"triptype_id"`
 	GenderType  string    `json:"genderType" xorm:"gender_type VARCHAR(20)"`
+	Region      string    `json:"region" xorm:"region"`
+	Concept     string    `json:"concept" xorm:"concept not null"`
 	StartDate   time.Time `json:"startDate" xorm:"start_date"`
 	EndDate     time.Time `json:"endDate" xorm:"end_date"`
 	CreateAt    time.Time `json:"createAt" xorm:"created"`
