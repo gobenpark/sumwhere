@@ -38,7 +38,7 @@ type TripInput struct {
 	UserId      int64  `json:"userId" valid:"required"`
 	MatchTypeID int64  `json:"matchTypeId" valid:"required"`
 	GenderType  string `json:"genderType" valid:"required"`
-	TripTypeId  int64  `json:"tripTypeId" valid:"required"`
+	TripPlaceID int64  `json:"tripPlaceId" valid:"required"`
 	Region      string `json:"region" valid:"required"`
 	Concept     string `json:"concept" valid:"required"`
 	StartDate   string `json:"startDate" valid:"required"`
@@ -75,7 +75,7 @@ func (t *TripInput) ToModel() (*models.Trip, error) {
 	trip := &models.Trip{
 		UserId:      t.UserId,
 		MatchTypeId: t.MatchTypeID,
-		TripTypeId:  t.TripTypeId,
+		TripPlaceId: t.TripPlaceID,
 		GenderType:  t.GenderType,
 		Region:      t.Region,
 		Concept:     t.Concept,

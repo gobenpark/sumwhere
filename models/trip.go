@@ -31,10 +31,10 @@ type Trip struct {
 	Id          int64     `json:"id" xorm:"id pk autoincr"`
 	UserId      int64     `json:"userId" xorm:"user_id" valid:"required"`
 	MatchTypeId int64     `json:"matchTypeId" xorm:"match_type_id"`
-	TripTypeId  int64     `json:"tripTypeId" xorm:"triptype_id"`
+	TripPlaceId int64     `json:"tripPlaceId" xorm:"trip_place_id"`
 	GenderType  string    `json:"genderType" xorm:"gender_type VARCHAR(20)"`
 	Region      string    `json:"region" xorm:"region"`
-	Concept     string    `json:"concept" xorm:"concept not null"`
+	Activity    string    `json:"activity" xorm:"activity not null"`
 	StartDate   time.Time `json:"startDate" xorm:"start_date"`
 	EndDate     time.Time `json:"endDate" xorm:"end_date"`
 	CreateAt    time.Time `json:"createAt" xorm:"created"`
@@ -77,7 +77,7 @@ func (Trip) Get(ctx context.Context, tripId, userId int64) (*Trip, error) {
 
 func (TripGroup) GetMyTrip(ctx context.Context, id int64) (*TripGroup, error) {
 	var item TripGroup
-	result, err := factory.DB(ctx).Where("user_id = ?", id).Join("INNER", "trip_place", "trip_place.id = trip.triptype_id").Get(&item)
+	result, err := factory.DB(ctx).Where("user_id = ?", id).Join("INNER", "trip_place", "trip_place.id = trip.trip_place_id").Get(&item)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (TripGroup) GetMyTrip(ctx context.Context, id int64) (*TripGroup, error) {
 func (TripGroup) GetAll(ctx context.Context, sortby, order []string, offset, limit int) (totalCount int64, items []TripGroup, err error) {
 
 	queryBuilder := func() xorm.Interface {
-		q := factory.DB(ctx).Join("INNER", "trip_place", "trip_place.id = trip.triptype_id")
+		q := factory.DB(ctx).Join("INNER", "trip_place", "trip_place.id = trip.tripp_lace_id")
 		if err := setSortOrder(q, sortby, order); err != nil {
 			factory.Logger(ctx).Error(err)
 		}
