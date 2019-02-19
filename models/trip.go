@@ -153,8 +153,9 @@ func (TripUserGroup) Join(ctx context.Context, trip *Trip, count int) (tripGroup
 		"WHERE (tripmatch_history.trip_id is null) "+
 		"AND (trip.user_id != %d) "+
 		"AND (user.gender = 'male') "+
-		"AND (DATE(start_date) BETWEEN '%s' AND '%s' OR DATE(end_date) BETWEEN '%s' AND '%s') "+
-		"limit 0,%d", trip.UserId, startDate, endDate, startDate, endDate, count)
+		"AND (start_date BETWEEN '%s' AND '%s' OR end_date BETWEEN '%s' AND '%s') "+
+		"ORDER BY DATEDIFF(start_date,'%s')"+
+		"limit 0,%d", trip.UserId, startDate, endDate, startDate, endDate, startDate, count)
 
 	err = factory.DB(ctx).SQL(query).Find(&tripGroup)
 	return
