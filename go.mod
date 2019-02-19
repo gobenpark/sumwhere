@@ -17,7 +17,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.0
 	github.com/go-xorm/xorm v0.7.1
 	github.com/gocql/gocql v0.0.0-20190204224311-252acab79f98
-	github.com/google/martian v2.1.0+incompatible // indirect
+	github.com/google/martian v2.1.0+incompatible
 	github.com/googleapis/gax-go v2.0.2+incompatible // indirect
 	github.com/gorilla/websocket v1.4.0
 	github.com/labstack/echo v3.3.10+incompatible

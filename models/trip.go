@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-xorm/xorm"
+	"strconv"
 	"sumwhere/factory"
+	"sumwhere/middlewares"
 	"time"
 )
 
@@ -20,7 +22,7 @@ func (TripUserGroup) TableName() string {
 
 type TripGroup struct {
 	Trip      `json:"trip" xorm:"extends"`
-	TripPlace `json:"tripType" xorm:"extends"`
+	TripPlace `json:"tripPlace" xorm:"extends"`
 }
 
 func (TripGroup) TableName() string {
@@ -43,10 +45,10 @@ type Trip struct {
 }
 
 func (t *Trip) Create(ctx context.Context) (int64, error) {
-	//tripId := strconv.FormatInt(t.TripTypeId, 10)
-	//if factory.Redis(ctx) != nil {
-	//	factory.Redis(ctx).ZIncrBy(TOPTRIP, 1, tripId)
-	//}
+	tripId := strconv.FormatInt(t.TripPlaceId, 10)
+	if factory.Redis(ctx, middlewares.ContextSetRedisName) != nil {
+		factory.Redis(ctx, middlewares.ContextSetRedisName).ZIncrBy(TOPTRIP, 1, tripId)
+	}
 	return factory.DB(ctx).Insert(t)
 }
 

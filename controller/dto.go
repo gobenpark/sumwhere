@@ -40,7 +40,7 @@ type TripInput struct {
 	GenderType  string `json:"genderType" valid:"required"`
 	TripPlaceID int64  `json:"tripPlaceId" valid:"required"`
 	Region      string `json:"region" valid:"required"`
-	Activity    string `json:"avtivity" valid:"required"`
+	Activity    string `json:"activity" valid:"required"`
 	StartDate   string `json:"startDate" valid:"required"`
 	EndDate     string `json:"endDate" valid:"required"`
 }

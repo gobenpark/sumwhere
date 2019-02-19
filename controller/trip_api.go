@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
 	"strconv"
@@ -31,6 +32,7 @@ func (TripController) Create(e echo.Context) error {
 		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorParameter, err)
 	}
 
+	fmt.Printf("%#v", t)
 	user, err := models.User{}.GetUserByJWT(e)
 	if err != nil {
 		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorUserNotExists, err)
