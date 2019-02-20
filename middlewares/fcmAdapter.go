@@ -1,12 +1,14 @@
-package utils
+package middlewares
 
 import (
 	"context"
 	"firebase.google.com/go"
+	"firebase.google.com/go/messaging"
 	"fmt"
 	"github.com/labstack/gommon/log"
 	"google.golang.org/api/option"
 	"os"
+	"time"
 )
 
 const (
@@ -17,6 +19,7 @@ const (
 )
 
 type AppAdapterInterface interface {
+	SendMessage(ctx context.Context, title, body, token string) error
 	SetSubscribe(ctx context.Context, isSubscribe bool, token []string, topic string) (int, error)
 	subscribe(ctx context.Context, token []string, topic string) (int, error)
 	unSubscribe(ctx context.Context, token []string, topic string) (int, error)
@@ -31,6 +34,7 @@ func NewFireBaseApp() (AppAdapterInterface, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	var opt option.ClientOption
 	if os.Getenv("RELEASE_SYSTEM") == "kubernetes" {
 		opt = option.WithCredentialsFile("/config/galmal-8f900-firebase-adminsdk-zhjsl-f6d034ad3b.json")
@@ -44,6 +48,46 @@ func NewFireBaseApp() (AppAdapterInterface, error) {
 	return &FireBaseAppAdapter{
 		app: app,
 	}, nil
+}
+
+func (f *FireBaseAppAdapter) SendMessage(ctx context.Context, title, body, token string) error {
+	oneHour := time.Duration(1) * time.Hour
+	badge := 1
+	m := messaging.Message{
+		Notification: &messaging.Notification{
+			Title: title,
+			Body:  body,
+		},
+		Android: &messaging.AndroidConfig{
+			TTL: &oneHour,
+			Notification: &messaging.AndroidNotification{
+				Title: "",
+				Icon:  "",
+				Color: "",
+				Sound: "",
+			},
+		},
+		APNS: &messaging.APNSConfig{
+			Payload: &messaging.APNSPayload{
+				Aps: &messaging.Aps{
+					Badge: &badge,
+				},
+			},
+		},
+		Token:     token,
+		Topic:     "",
+		Condition: "",
+	}
+
+	client, err := f.app.Messaging(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = client.Send(ctx, &m)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (f *FireBaseAppAdapter) SetSubscribe(ctx context.Context, isSubscribe bool, token []string, topic string) (int, error) {
@@ -90,42 +134,3 @@ func (f *FireBaseAppAdapter) unSubscribe(ctx context.Context, token []string, to
 	}
 	return res.SuccessCount, nil
 }
-
-//
-//type WorkerLauncher interface {
-//	LaunchWorker(in chan Work)
-//}
-//
-//type Worker struct {
-//	*messaging.Client
-//}
-//
-//func (w *Worker) LaunchWorker(in chan Work) {
-//	badge := 10
-//	for work := range in {
-//
-//		message := &messaging.Message{
-//			Android: nil,
-//			APNS: &messaging.APNSConfig{
-//				Headers: map[string]string{
-//					"apns-priority": "10",
-//				},
-//				Payload: &messaging.APNSPayload{
-//					Aps: &messaging.Aps{
-//						AlertString: "test",
-//						Alert:       nil,
-//						Badge:       &badge,
-//					},
-//					CustomData: nil,
-//				},
-//			},
-//			Token: work.Token,
-//		}
-//
-//		result, err := w.Send(context.Background(), message)
-//		if err != nil {
-//			log.Error(err)
-//		}
-//		fmt.Println("success", result)
-//	}
-//}

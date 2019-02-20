@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
-	"github.com/labstack/gommon/log"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
@@ -40,11 +39,6 @@ func (MatchController) MatchListFromMysql(e echo.Context, userID int64, trip *mo
 	if err != nil {
 		return nil, utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorParameter, err)
 	}
-	for _, data := range trips {
-		if _, err := data.InsertHistory(e.Request().Context(), userID); err != nil {
-			return nil, utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
-		}
-	}
 	return trips, nil
 }
 
@@ -64,38 +58,12 @@ func (m MatchController) GetMatchList(e echo.Context) error {
 	if err != nil {
 		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorParameter, err)
 	}
-
-	resultData, _ := factory.Redis(e.Request().Context(), middlewares.ContextGetRedisName).
-		HGet(middlewares.MATCH_RECOMMAND, fmt.Sprintf("trip:%d", tid)).
-		Bytes()
-
-	log.Info(resultData)
-	if len(resultData) == 0 {
-		trips, err := m.MatchListFromMysql(e, claims.Id, trip, 4)
-		if err != nil {
-			return err
-		}
-
-		bytes, err := json.Marshal(trips)
-		if err != nil {
-			return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorSystem, err)
-		}
-
-		if err := factory.Redis(e.Request().Context(), middlewares.ContextSetRedisName).
-			HSet(middlewares.MATCH_RECOMMAND, fmt.Sprintf("trip:%d", tid), bytes).
-			Err(); err != nil {
-			return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorRedis, err)
-		}
-		return utils.ReturnApiSucc(e, http.StatusOK, trips)
-	} else {
-
-		var m []models.TripUserGroup
-		if err := json.Unmarshal(resultData, &m); err != nil {
-			return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorSystem, err)
-		}
-
-		return utils.ReturnApiSucc(e, http.StatusOK, m)
+	trips, err := m.MatchListFromMysql(e, claims.Id, trip, 4)
+	if err != nil {
+		return err
 	}
+
+	return utils.ReturnApiSucc(e, http.StatusOK, trips)
 }
 
 func (MatchController) MatchRequestCheck(e echo.Context) error {

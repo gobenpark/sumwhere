@@ -86,6 +86,13 @@ func (s Sumwhere) setMiddleWare() error {
 	if err != nil {
 		return err
 	}
+
+	fb, err := middlewares.NewFireBaseApp()
+	if err != nil {
+		return err
+	}
+
+	s.Use(middlewares.ContextFireBase(&fb))
 	s.Use(middlewares.ContextDB("sumwhere", db))
 	s.Use(middlewares.ContextRedis(middlewares.ContextSetRedisName, initSetRedis()))
 	s.Use(middlewares.Logger())
