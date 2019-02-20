@@ -51,3 +51,15 @@ func Redis(ctx context.Context, name string) *redis.Client {
 	}
 	panic("Redis is not exist")
 }
+
+func Firebase(ctx context.Context) middlewares.AppAdapterInterface {
+	v := ctx.Value(middlewares.ContextFirebaseName)
+	if v == nil {
+		panic("Firebase not exist")
+	}
+
+	if firebase, ok := v.(*middlewares.FireBaseAppAdapter); ok {
+		return firebase
+	}
+	panic("Firebase not exist")
+}

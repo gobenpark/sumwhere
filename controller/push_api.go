@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/gommon/log"
 	"net/http"
+	"sumwhere/factory"
 	"sumwhere/models"
 	"sumwhere/utils"
 )
@@ -86,6 +87,7 @@ func (PushController) FcmTokenUpdate(e echo.Context) error {
 
 // TODO: 에러 발생시 해결해야될 사항
 func (PushController) ChangeSubscribe(ctx context.Context, source models.Push, target models.PushInput) {
+	factory.Firebase(ctx)
 	app, err := utils.NewFireBaseApp()
 	if err != nil {
 		log.Error(err)
