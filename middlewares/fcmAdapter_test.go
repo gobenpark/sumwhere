@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"context"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -17,7 +16,6 @@ func TestFireBaseAppAdapter_SendMessage(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, app)
 
-	ctx := context.Background()
-	err = app.SendMessage(ctx, "test", "test", "eIbIzANXYYE:APA91bGrXQg5ns5aQK4m979ygcqwafKI0Hxzi8fK8Z-_UHROpjrGCqgYcsljRdSkCZE6OjMJVnKFbwUqnNhfvhLAUaToKgKD4gdALgWGGtt-S8Ev7FCDFeUg1T3knfGET-dOvMsPKtLH")
+	err = app.SendMessage("test", "test", "eIbIzANXYYE:APA91bGrXQg5ns5aQK4m979ygcqwafKI0Hxzi8fK8Z-_UHROpjrGCqgYcsljRdSkCZE6OjMJVnKFbwUqnNhfvhLAUaToKgKD4gdALgWGGtt-S8Ev7FCDFeUg1T3knfGET-dOvMsPKtLH")
 	assert.NoError(t, err)
 }

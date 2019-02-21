@@ -96,8 +96,19 @@ func (MatchController) MatchRequest(e echo.Context) error {
 		FromMatchId: m.FromMatchId,
 		ToMatchId:   m.ToMatchId,
 	}
+
 	if _, err := m.Insert(e.Request().Context()); err != nil {
 		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorTokenInvaild, err)
+	}
+
+	push, err := models.Push{}.Get(e.Request().Context(), m.ToMatchId)
+	if err != nil {
+		factory.Logger(e.Request().Context()).Error(err)
+	}
+
+	err = factory.Firebase(e.Request().Context()).SendMessage("", "새로운 동행신청이 도착했어요!", push.FcmToken)
+	if err != nil {
+		factory.Logger(e.Request().Context()).Error(err)
 	}
 
 	return utils.ReturnApiSucc(e, http.StatusOK, m)

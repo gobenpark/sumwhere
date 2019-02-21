@@ -143,10 +143,10 @@ func (UserController) CreateProfile(e echo.Context) error {
 		Job:           job,
 		TripStyleType: tripStyleType,
 		CharacterType: characterModel,
-		Image1:        utils.ProfileSaver(image1, user, "image1"),
-		Image2:        utils.ProfileSaver(image2, user, "image2"),
-		Image3:        utils.ProfileSaver(image3, user, "image3"),
-		Image4:        utils.ProfileSaver(image4, user, "image4"),
+		Image1:        ProfileSaver(image1, user, "image1"),
+		Image2:        ProfileSaver(image2, user, "image2"),
+		Image3:        ProfileSaver(image3, user, "image3"),
+		Image4:        ProfileSaver(image4, user, "image4"),
 	}
 
 	if err := e.Validate(profileInput); err != nil {
