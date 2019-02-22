@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/gommon/log"
 	"net/http"
 	"sumwhere/factory"
+	"sumwhere/middlewares"
 	"sumwhere/models"
 	"sumwhere/utils"
 )
@@ -87,13 +88,9 @@ func (PushController) FcmTokenUpdate(e echo.Context) error {
 
 // TODO: 에러 발생시 해결해야될 사항
 func (PushController) ChangeSubscribe(ctx context.Context, source models.Push, target models.PushInput) {
-	factory.Firebase(ctx)
-	app, err := utils.NewFireBaseApp()
-	if err != nil {
-		log.Error(err)
-	}
+
 	if source.ChatAlert != target.ChatAlert {
-		result, err := app.SetSubscribe(ctx, target.ChatAlert, []string{source.FcmToken}, utils.CHATALERT)
+		result, err := factory.Firebase(ctx).SetSubscribe(ctx, target.ChatAlert, []string{source.FcmToken}, middlewares.CHATALERT)
 		if err != nil {
 			log.Error(err)
 		}
@@ -101,7 +98,7 @@ func (PushController) ChangeSubscribe(ctx context.Context, source models.Push, t
 	}
 
 	if source.MatchAlert != target.MatchAlert {
-		result, err := app.SetSubscribe(ctx, target.MatchAlert, []string{source.FcmToken}, utils.MATCHALERT)
+		result, err := factory.Firebase(ctx).SetSubscribe(ctx, target.MatchAlert, []string{source.FcmToken}, middlewares.MATCHALERT)
 		if err != nil {
 			log.Error(err)
 		}
@@ -109,7 +106,7 @@ func (PushController) ChangeSubscribe(ctx context.Context, source models.Push, t
 	}
 
 	if source.FriendAlert != target.FriendAlert {
-		result, err := app.SetSubscribe(ctx, target.FriendAlert, []string{source.FcmToken}, utils.FRIENDALERT)
+		result, err := factory.Firebase(ctx).SetSubscribe(ctx, target.FriendAlert, []string{source.FcmToken}, middlewares.FRIENDALERT)
 		if err != nil {
 			log.Error(err)
 		}
@@ -117,13 +114,12 @@ func (PushController) ChangeSubscribe(ctx context.Context, source models.Push, t
 	}
 
 	if source.EventAlert != target.EventAlert {
-		result, err := app.SetSubscribe(ctx, target.EventAlert, []string{source.FcmToken}, utils.EVENTALERT)
+		result, err := factory.Firebase(ctx).SetSubscribe(ctx, target.EventAlert, []string{source.FcmToken}, middlewares.EVENTALERT)
 		if err != nil {
 			log.Error(err)
 		}
 		log.Info(result)
 	}
-
 }
 
 func (PushController) GetHistory(e echo.Context) error {
