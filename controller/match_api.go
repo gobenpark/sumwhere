@@ -58,6 +58,7 @@ func (m MatchController) GetMatchList(e echo.Context) error {
 	if err != nil {
 		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorParameter, err)
 	}
+
 	trips, err := m.MatchListFromMysql(e, claims.Id, trip, 4)
 	if err != nil {
 		return err
