@@ -18,6 +18,7 @@ type PushController struct {
 
 func (p PushController) Init(g *echo.Group) {
 	g.GET("/push", p.GetAllPush)
+	//g.GET("/push/id",)
 	g.PUT("/push", p.UpdatePush)
 	g.PUT("/fcmToken", p.FcmTokenUpdate)
 	g.GET("/pushHistory", p.GetHistory)

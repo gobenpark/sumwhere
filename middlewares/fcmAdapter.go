@@ -19,7 +19,7 @@ const (
 )
 
 type AppAdapterInterface interface {
-	SendMessage(ctx context.Context, title, body, token string) error
+	SendMessage(title, body, token string) error
 	SetSubscribe(ctx context.Context, isSubscribe bool, token []string, topic string) (int, error)
 	subscribe(ctx context.Context, token []string, topic string) (int, error)
 	unSubscribe(ctx context.Context, token []string, topic string) (int, error)
@@ -50,9 +50,10 @@ func NewFireBaseApp() (AppAdapterInterface, error) {
 	}, nil
 }
 
-func (f *FireBaseAppAdapter) SendMessage(ctx context.Context, title, body, token string) error {
+func (f *FireBaseAppAdapter) SendMessage(title, body, token string) error {
+	ctx := context.Background()
 	oneHour := time.Duration(1) * time.Hour
-	badge := 1
+	badge := 0
 	m := messaging.Message{
 		Notification: &messaging.Notification{
 			Title: title,
