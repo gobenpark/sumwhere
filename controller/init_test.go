@@ -33,14 +33,17 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+
 	rclient := redis.NewClient(opt)
 
-	_ = xormEngine.Sync(new(models.Banner),
+	_ = xormEngine.Sync2(new(models.Banner),
 		new(models.Country),
 		new(models.Advertisement),
 		new(models.Notice),
-		new(models.Event))
+		new(models.Event),
+		new(models.TripPlace))
 
+	fmt.Println("start")
 	echoApp = echo.New()
 	echoApp.Validator = &Validator{}
 

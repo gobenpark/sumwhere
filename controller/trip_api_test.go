@@ -52,7 +52,6 @@ func TestTripController_GetTripPlace(t *testing.T) {
 
 	assert.NoError(t, json.Unmarshal(rec.Body.Bytes(), &v))
 	assert.Equal(t, true, v.Success)
-	t.Log(v.Result)
 }
 
 func TestTripController_GetTripCountry(t *testing.T) {
@@ -67,6 +66,17 @@ func TestTripController_GetTripCountry(t *testing.T) {
 		Result  []models.Country `json:"result"`
 		Success bool             `json:"success"`
 	}
+	t.Log(rec.Body)
 	assert.NoError(t, json.Unmarshal(rec.Body.Bytes(), &v))
 	assert.Equal(t, true, v.Success)
+}
+
+func TestTripController_GetTripStyles(t *testing.T) {
+	req := httptest.NewRequest(echo.GET, "/trip/style?numbers=1,2,3,10,11,12,19,20,21", nil)
+	req.Header.Set(echo.HeaderAuthorization, TOKEN)
+	rec := httptest.NewRecorder()
+	ctx := echoApp.NewContext(req, rec)
+
+	assert.NoError(t, handleWithFilter(TripController{}.GetTripStyles, ctx))
+	assert.Equal(t, http.StatusOK, rec.Code)
 }
