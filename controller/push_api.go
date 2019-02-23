@@ -121,7 +121,6 @@ func (PushController) ChangeSubscribe(ctx context.Context, source models.Push, t
 		}
 		log.Info(result)
 	}
-
 }
 
 func (PushController) GetHistory(e echo.Context) error {

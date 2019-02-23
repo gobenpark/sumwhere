@@ -66,7 +66,6 @@ func (t *Trip) Update(ctx context.Context, id int64) error {
 
 func (Trip) Get(ctx context.Context, tripId, userId int64) (*Trip, error) {
 	var t Trip
-
 	result, err := factory.DB(ctx).ID(tripId).Where("user_id = ?", userId).Get(&t)
 	if err != nil {
 		return nil, err

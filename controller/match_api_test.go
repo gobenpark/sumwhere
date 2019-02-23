@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/labstack/echo"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
@@ -29,12 +28,12 @@ func TestMatchController_GetTotalCount(t *testing.T) {
 }
 
 func TestMatchController_GetMatchList(t *testing.T) {
-	req := httptest.NewRequest(echo.GET, "/match/list?tripId=64", nil)
+	req := httptest.NewRequest(echo.GET, "/match/list?tripId=1", nil)
 	req.Header.Set(echo.HeaderAuthorization, TOKEN)
 	rec := httptest.NewRecorder()
 	ctx := echoApp.NewContext(req, rec)
 
-	assert.NoError(t, handleWithFilter(MatchController{}.GetMatchList, ctx))
-	assert.Equal(t, http.StatusOK, rec.Code)
+	require.NoError(t, handleWithFilter(MatchController{}.GetMatchList, ctx))
+	require.Equal(t, http.StatusOK, rec.Code)
 	t.Log(rec.Body)
 }

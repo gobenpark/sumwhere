@@ -42,7 +42,7 @@ func TestTripController_GetTripPlace(t *testing.T) {
 	ctx := echoApp.NewContext(req, rec)
 	ctx.SetParamNames("countryid")
 	ctx.SetParamValues("1")
-	assert.NoError(t, handleWithFilter(TripController{}.GetMyTrip, ctx))
+	assert.NoError(t, handleWithFilter(TripController{}.GetTripPlace, ctx))
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 	var v struct {
