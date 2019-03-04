@@ -116,6 +116,7 @@ func (Sumwhere) privateController(e *echo.Group) {
 	controllers.ReportController{}.Init(e)
 	controllers.BannerController{}.Init(e)
 	controllers.PushController{}.Init(e)
+	controllers.MainController{}.Init(e)
 }
 
 func (Sumwhere) publicController(e *echo.Group) {

@@ -16,6 +16,9 @@ VERSIONS:=$(VERSION).$(GITCOMMITCOUNT)-$(GITHASH)-$(DATETIME)
 clean:
 	$(GOCLEAN)
 
+test:
+	go test -race ./...
+
 sumwhere:
 	@GOOS=linux GOARCH=amd64 CGO_ENABLED=0 $(GOBUILD) -o $@ -ldflags "-X main.ServiceVersion=$(VERSIONS)" *.go
 

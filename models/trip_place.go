@@ -10,17 +10,23 @@ import (
 const TOPTRIP = "toptrip"
 const RECENTTOPTRIP = "recenttoptrip"
 
+type CountryJoin struct {
+	Country   `json:"country" xorm:"extends"`
+	TripPlace `json:"tripPlace" xorm:"extends"`
+}
+
 type TripRank struct {
 	TripPlace
 	Rank float64
 }
 
 type TripPlace struct {
-	Id          int64  `json:"id" xorm:"id pk"`
-	Trip        string `json:"trip"`
-	Discription string `json:"discription" xorm:"discription"`
-	CountryID   int64  `json:"countryId" xorm:"country_id"`
-	ImageURL    string `json:"imageURL" xorm:"image_url"`
+	Id          int64    `json:"id" xorm:"id pk"`
+	Trip        string   `json:"trip"`
+	Discription string   `json:"discription" xorm:"discription"`
+	CountryID   int64    `json:"countryId" xorm:"country_id"`
+	ImageURL    string   `json:"imageURL" xorm:"image_url"`
+	Keywords    []string `json:"keywords" xorm:"keywords"`
 }
 
 func (TripPlace) Search(ctx context.Context, destination string) (t []TripPlace, err error) {
@@ -63,4 +69,13 @@ func (TripPlace) TopTripPlaces(ctx context.Context) ([]TripRank, error) {
 	}
 
 	return trips, nil
+}
+
+func (TripPlace) GetCountryJoind(ctx context.Context) ([]CountryJoin, error) {
+	var jm []CountryJoin
+	err := factory.DB(ctx).Table("trip_place").Join("LEFT", "country", "trip_place.country_id = country.id").Find(&jm)
+	if err != nil {
+		return nil, err
+	}
+	return jm, nil
 }

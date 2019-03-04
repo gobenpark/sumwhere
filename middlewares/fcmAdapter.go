@@ -30,22 +30,21 @@ type FireBaseAppAdapter struct {
 }
 
 func NewFireBaseApp() (AppAdapterInterface, error) {
-	//dir, err := os.Getwd()
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	var opt option.ClientOption
 	if os.Getenv("RELEASE_SYSTEM") == "kubernetes" {
 		opt = option.WithCredentialsFile("/config/galmal-8f900-firebase-adminsdk-zhjsl-f6d034ad3b.json")
 	} else {
-		opt = option.WithCredentialsFile("./kubernetes/galmal-8f900-firebase-adminsdk-zhjsl-f6d034ad3b.json")
+		opt = option.WithCredentialsFile(dir + "/galmal-8f900-firebase-adminsdk-zhjsl-f6d034ad3b.json")
 	}
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing app: %v", err)
 	}
-	fmt.Println(app)
 	return &FireBaseAppAdapter{
 		app: app,
 	}, nil
