@@ -14,8 +14,9 @@ type MatchRequestJoin struct {
 type MatchRequest struct {
 	FromMatchId int64     `json:"fromMatchId" xorm:"from_match_id"`
 	ToMatchId   int64     `json:"toMatchId" xorm:"to_match_id"`
-	CreateAt    time.Time `json:"createAt" xorm:"created"`
 	DeleteAt    time.Time `xorm:"deleted"`
+	Accepted    bool      `json:"accepted" xorm:"accepted default 0"`
+	CreateAt    time.Time `json:"createAt" xorm:"create_at created"`
 }
 
 func (m *MatchRequest) Insert(ctx context.Context) (int64, error) {
@@ -34,4 +35,17 @@ func (MatchRequestJoin) FindSendRequest(ctx context.Context, userID int64) (m []
 		Join("INNER", "trip t1", "from_match_id = t1.id AND t1.user_id = ?", userID).
 		Join("INNER", "trip t2", "to_match_id = t2.id").Find(&m)
 	return
+}
+
+func (MatchRequest) Get(ctx context.Context, from, to int64) (*MatchRequest, error) {
+	var m MatchRequest
+	result, err := factory.DB(ctx).Where("from_match_id = ?", from).And("to_match_id = ?", to).Get(&m)
+	if err != nil {
+		return nil, err
+	}
+	if !result {
+		return nil, nil
+	}
+
+	return &m, nil
 }

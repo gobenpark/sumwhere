@@ -188,7 +188,7 @@ func initSetRedis() *redis.Client {
 		client = redis.NewClient(opt)
 		log.Info(client.Ping().Val())
 	} else {
-		opt, err := redis.ParseURL("redis://:@1.215.236.26:53379")
+		opt, err := redis.ParseURL("redis://:@192.168.1.63:6379")
 		if err != nil {
 			panic(err)
 		}

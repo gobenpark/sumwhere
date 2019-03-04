@@ -20,16 +20,15 @@ type MatchController struct {
 }
 
 func (m MatchController) Init(g *echo.Group) {
-	g.POST("/match", m.Create)
 	g.POST("/match/member", m.JoinMember)
 	g.POST("/match/request", m.MatchRequest)
 	g.GET("/match/list", m.GetMatchList)
 	g.GET("/match/new", m.NewMatchList)
 	g.GET("/match/check", m.MatchRequestCheck)
-	g.GET("/match", m.GetAll)
-	g.GET("/match", m.JoinMember)
+	g.GET("/match/status", m.GetStatus)
+	//g.GET("/match", m.GetAll)
 	g.GET("/match/receive", m.MatchReceive)
-	g.GET("/match/send", m.MatchSend)
+	//g.GET("/match/send", m.MatchSend)
 	g.GET("/match/type", m.GetMatchTypes)
 
 	g.GET("/match/totalcount", m.GetTotalCount)
@@ -103,7 +102,7 @@ func (MatchController) MatchRequest(e echo.Context) error {
 	}
 
 	if _, err := m.Insert(e.Request().Context()); err != nil {
-		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorTokenInvaild, err)
+		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
 	}
 
 	push, err := models.Push{}.Get(e.Request().Context(), m.ToMatchId)
@@ -111,9 +110,11 @@ func (MatchController) MatchRequest(e echo.Context) error {
 		factory.Logger(e.Request().Context()).Error(err)
 	}
 
-	err = factory.Firebase(e.Request().Context()).SendMessage("", "새로운 동행신청이 도착했어요!", push.FcmToken)
-	if err != nil {
-		factory.Logger(e.Request().Context()).Error(err)
+	if push != nil {
+		err = factory.Firebase(e.Request().Context()).SendMessage("", "새로운 동행신청이 도착했어요!", push.FcmToken)
+		if err != nil {
+			factory.Logger(e.Request().Context()).Error(err)
+		}
 	}
 
 	return utils.ReturnApiSucc(e, http.StatusOK, m)
@@ -204,14 +205,6 @@ func (MatchController) MatchSend(e echo.Context) error {
 	return utils.ReturnApiSucc(e, http.StatusOK, result)
 }
 
-func (MatchController) Create(e echo.Context) error {
-	_, err := models.User{}.GetUserByJWT(e)
-	if err != nil {
-		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorTokenInvaild, err)
-	}
-	return nil
-}
-
 func (MatchController) GetAll(e echo.Context) error {
 	var v SearchInput
 	if err := e.Bind(&v); err != nil {
@@ -299,3 +292,18 @@ func (MatchController) GetHistoryRequest(e echo.Context) error {
 //func (MatchController) GetHistoryReceive(e echo.Context) error {
 //
 //}
+
+func (MatchController) GetStatus(e echo.Context) error {
+	users := e.Get("user").(*jwt.Token)
+	claims := users.Claims.(*models.JwtCustomClaims)
+	result, err := strconv.ParseInt(e.QueryParam("id"), 10, 64)
+	if err != nil {
+		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorParameter, errors.New("유효하지 않은 아이디입니다."))
+	}
+
+	request, err := models.MatchRequest{}.Get(e.Request().Context(), claims.Id, result)
+	if err != nil {
+		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
+	}
+	return utils.ReturnApiSucc(e, http.StatusOK, request)
+}
