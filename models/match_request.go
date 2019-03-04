@@ -14,7 +14,8 @@ type MatchRequestJoin struct {
 type MatchRequest struct {
 	FromMatchId int64     `json:"fromMatchId" xorm:"from_match_id"`
 	ToMatchId   int64     `json:"toMatchId" xorm:"to_match_id"`
-	CreateAt    time.Time `json:"createAt" xorm:"create_at created"`
+	CreateAt    time.Time `json:"createAt" xorm:"created"`
+	DeleteAt    time.Time `xorm:"deleted"`
 }
 
 func (m *MatchRequest) Insert(ctx context.Context) (int64, error) {

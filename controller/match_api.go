@@ -31,7 +31,11 @@ func (m MatchController) Init(g *echo.Group) {
 	g.GET("/match/receive", m.MatchReceive)
 	g.GET("/match/send", m.MatchSend)
 	g.GET("/match/type", m.GetMatchTypes)
+
 	g.GET("/match/totalcount", m.GetTotalCount)
+	g.GET("/match/history/receive", m.GetHistoryRequest)
+	//g.GET("/match/history/request",)
+
 }
 
 func (MatchController) MatchListFromMysql(e echo.Context, userID int64, trip *models.Trip, count int) ([]models.TripUserGroup, error) {
@@ -281,3 +285,17 @@ func (MatchController) GetTotalCount(e echo.Context) error {
 	}
 	return utils.ReturnApiSucc(e, http.StatusOK, count)
 }
+
+func (MatchController) GetHistoryRequest(e echo.Context) error {
+	users := e.Get("user").(*jwt.Token)
+	claims := users.Claims.(*models.JwtCustomClaims)
+	m, err := models.MatchRequestJoin{}.FindReceiveRequest(e.Request().Context(), claims.Id)
+	if err != nil {
+		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
+	}
+	return utils.ReturnApiSucc(e, http.StatusOK, m)
+}
+
+//func (MatchController) GetHistoryReceive(e echo.Context) error {
+//
+//}

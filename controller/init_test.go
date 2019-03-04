@@ -42,7 +42,7 @@ func init() {
 		new(models.Notice),
 		new(models.Event),
 		new(models.Trip),
-		new(models.TripPlace))
+		new(models.TripStyle))
 
 	echoApp = echo.New()
 	echoApp.Validator = &Validator{}

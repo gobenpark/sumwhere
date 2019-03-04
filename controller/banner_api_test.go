@@ -19,6 +19,7 @@ func TestBannerController_GetBanner(t *testing.T) {
 	ctx := echoApp.NewContext(req, rec)
 	assert.NoError(t, handleWithFilter(BannerController{}.GetBanner, ctx))
 	assert.Equal(t, http.StatusOK, rec.Code)
+	t.Log(rec.Body)
 
 	var v struct {
 		Result  []models.Banner `json:"result"`

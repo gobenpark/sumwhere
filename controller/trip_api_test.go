@@ -66,7 +66,6 @@ func TestTripController_GetTripCountry(t *testing.T) {
 		Result  []models.Country `json:"result"`
 		Success bool             `json:"success"`
 	}
-	t.Log(rec.Body)
 	assert.NoError(t, json.Unmarshal(rec.Body.Bytes(), &v))
 	assert.Equal(t, true, v.Success)
 }
