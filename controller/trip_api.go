@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo"
 	"net/http"
 	"strconv"
+	"strings"
 	"sumwhere/factory"
 	"sumwhere/models"
 	"sumwhere/utils"
@@ -21,6 +22,7 @@ func (t TripController) Init(g *echo.Group) {
 	g.GET("/trip/country", t.GetTripCountry)
 	g.GET("/trip", t.GetMyTrip)
 	g.GET("/trip/place/:countryid", t.GetTripPlace)
+	g.GET("/trip/style", t.GetTripStyles)
 }
 
 /*
@@ -141,5 +143,14 @@ func (TripController) GetTripPlace(e echo.Context) error {
 		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
 	}
 	return utils.ReturnApiSucc(e, http.StatusOK, ts)
+}
 
+func (TripController) GetTripStyles(e echo.Context) error {
+	result := strings.Split(e.QueryParam("numbers"), ",")
+
+	ts, err := models.TripStyle{}.GetFromIDS(e.Request().Context(), result)
+	if err != nil {
+		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorDB, err)
+	}
+	return utils.ReturnApiSucc(e, http.StatusOK, ts)
 }
