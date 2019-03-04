@@ -143,7 +143,10 @@ func initDB() (*xorm.Engine, error) {
 	if err != nil {
 		return nil, err
 	}
-	db.ShowSQL(true)
+
+	if os.Getenv("RELEASE_SYSTEM") != "kubernetes" {
+		db.ShowSQL(true)
+	}
 
 	_ = db.Sync2(
 		new(models.User),

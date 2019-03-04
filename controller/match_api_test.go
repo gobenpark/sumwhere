@@ -37,3 +37,14 @@ func TestMatchController_GetMatchList(t *testing.T) {
 	require.Equal(t, http.StatusOK, rec.Code)
 	t.Log(rec.Body)
 }
+
+//func TestMatchController_MatchRequest(t *testing.T) {
+//	data := models.MatchRequest
+//
+//
+//	req := httptest.NewRequest(echo.GET, "/match/request", nil)
+//	req.Header.Set(echo.HeaderAuthorization, TOKEN)
+//	rec := httptest.NewRecorder()
+//	ctx := echoApp.NewContext(req, rec)
+//
+//}

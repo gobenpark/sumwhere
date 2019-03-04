@@ -57,10 +57,17 @@ func init() {
 		},
 	})
 
+	fb, err := middlewares.NewFireBaseApp()
+	if err != nil {
+		panic(err)
+	}
+
+	firebase := middlewares.ContextFireBase(&fb)
+
 	redisClient := middlewares.ContextRedis(middlewares.ContextSetRedisName, rclient)
 
 	handleWithFilter = func(handlerFunc echo.HandlerFunc, c echo.Context) error {
-		return redisClient(token(db(handlerFunc)))(c)
+		return firebase(redisClient(token(db(handlerFunc))))(c)
 	}
 }
 

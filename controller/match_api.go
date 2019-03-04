@@ -26,6 +26,7 @@ func (m MatchController) Init(g *echo.Group) {
 	g.GET("/match/list", m.GetMatchList)
 	g.GET("/match/new", m.NewMatchList)
 	g.GET("/match/check", m.MatchRequestCheck)
+	g.GET("/match/status", m.GetStatus)
 	g.GET("/match", m.GetAll)
 	g.GET("/match", m.JoinMember)
 	g.GET("/match/receive", m.MatchReceive)
@@ -99,7 +100,7 @@ func (MatchController) MatchRequest(e echo.Context) error {
 	}
 
 	if _, err := m.Insert(e.Request().Context()); err != nil {
-		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorTokenInvaild, err)
+		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
 	}
 
 	push, err := models.Push{}.Get(e.Request().Context(), m.ToMatchId)
@@ -280,4 +281,19 @@ func (MatchController) GetTotalCount(e echo.Context) error {
 		return utils.ReturnApiSucc(e, http.StatusOK, 30)
 	}
 	return utils.ReturnApiSucc(e, http.StatusOK, count)
+}
+
+func (MatchController) GetStatus(e echo.Context) error {
+	users := e.Get("user").(*jwt.Token)
+	claims := users.Claims.(*models.JwtCustomClaims)
+	result, err := strconv.ParseInt(e.QueryParam("id"), 10, 64)
+	if err != nil {
+		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorParameter, errors.New("유효하지 않은 아이디입니다."))
+	}
+
+	request, err := models.MatchRequest{}.Get(e.Request().Context(), claims.Id, result)
+	if err != nil {
+		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
+	}
+	return utils.ReturnApiSucc(e, http.StatusOK, request)
 }
