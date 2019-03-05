@@ -25,15 +25,10 @@ func (m MatchController) Init(g *echo.Group) {
 	g.GET("/match/list", m.GetMatchList)
 	g.GET("/match/new", m.NewMatchList)
 	g.GET("/match/check", m.MatchRequestCheck)
-	g.GET("/match/status", m.GetStatus)
-	//g.GET("/match", m.GetAll)
-	g.GET("/match/receive", m.MatchReceive)
-	//g.GET("/match/send", m.MatchSend)
 	g.GET("/match/type", m.GetMatchTypes)
-
 	g.GET("/match/totalcount", m.GetTotalCount)
-	g.GET("/match/history/receive", m.GetHistoryRequest)
-	//g.GET("/match/history/request",)
+
+	g.GET("/match/history/receive", m.GetMatchRequestHistory)
 
 }
 
@@ -82,12 +77,10 @@ func (MatchController) MatchRequestCheck(e echo.Context) error {
 }
 
 func (MatchController) MatchRequest(e echo.Context) error {
-	_, err := models.User{}.GetUserByJWT(e)
-	if err != nil {
-		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorTokenInvaild, err)
-	}
+	users := e.Get("user").(*jwt.Token)
+	claims := users.Claims.(*models.JwtCustomClaims)
 
-	var m models.MatchRequest
+	var m models.MatchRequestDTO
 	if err := e.Bind(&m); err != nil {
 		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorTokenInvaild, err)
 	}
@@ -96,28 +89,12 @@ func (MatchController) MatchRequest(e echo.Context) error {
 		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorTokenInvaild, err)
 	}
 
-	m = models.MatchRequest{
-		FromMatchId: m.FromMatchId,
-		ToMatchId:   m.ToMatchId,
-	}
-
-	if _, err := m.Insert(e.Request().Context()); err != nil {
+	historyModel := m.ToModel(claims.Id)
+	if err := historyModel.Insert(e.Request().Context()); err != nil {
 		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
 	}
 
-	push, err := models.Push{}.Get(e.Request().Context(), m.ToMatchId)
-	if err != nil {
-		factory.Logger(e.Request().Context()).Error(err)
-	}
-
-	if push != nil {
-		err = factory.Firebase(e.Request().Context()).SendMessage("", "새로운 동행신청이 도착했어요!", push.FcmToken)
-		if err != nil {
-			factory.Logger(e.Request().Context()).Error(err)
-		}
-	}
-
-	return utils.ReturnApiSucc(e, http.StatusOK, m)
+	return utils.ReturnApiSucc(e, http.StatusOK, historyModel)
 }
 
 /*
@@ -177,32 +154,6 @@ func (MatchController) NewMatchList(e echo.Context) error {
 	}
 
 	return utils.ReturnApiSucc(e, http.StatusOK, m)
-}
-
-func (MatchController) MatchReceive(e echo.Context) error {
-	user, err := models.User{}.GetUserByJWT(e)
-	if err != nil {
-		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorParameter, err)
-	}
-
-	result, err := models.MatchRequestJoin{}.FindReceiveRequest(e.Request().Context(), user.Id)
-	if err != nil {
-		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorParameter, err)
-	}
-	return utils.ReturnApiSucc(e, http.StatusOK, result)
-}
-
-func (MatchController) MatchSend(e echo.Context) error {
-	user, err := models.User{}.GetUserByJWT(e)
-	if err != nil {
-		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorParameter, err)
-	}
-
-	result, err := models.MatchRequestJoin{}.FindSendRequest(e.Request().Context(), user.Id)
-	if err != nil {
-		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorParameter, err)
-	}
-	return utils.ReturnApiSucc(e, http.StatusOK, result)
 }
 
 func (MatchController) GetAll(e echo.Context) error {
@@ -279,31 +230,7 @@ func (MatchController) GetTotalCount(e echo.Context) error {
 	return utils.ReturnApiSucc(e, http.StatusOK, count)
 }
 
-func (MatchController) GetHistoryRequest(e echo.Context) error {
-	users := e.Get("user").(*jwt.Token)
-	claims := users.Claims.(*models.JwtCustomClaims)
-	m, err := models.MatchRequestJoin{}.FindReceiveRequest(e.Request().Context(), claims.Id)
-	if err != nil {
-		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
-	}
-	return utils.ReturnApiSucc(e, http.StatusOK, m)
-}
+func (MatchController) GetMatchRequestHistory(e echo.Context) error {
 
-//func (MatchController) GetHistoryReceive(e echo.Context) error {
-//
-//}
-
-func (MatchController) GetStatus(e echo.Context) error {
-	users := e.Get("user").(*jwt.Token)
-	claims := users.Claims.(*models.JwtCustomClaims)
-	result, err := strconv.ParseInt(e.QueryParam("id"), 10, 64)
-	if err != nil {
-		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorParameter, errors.New("유효하지 않은 아이디입니다."))
-	}
-
-	request, err := models.MatchRequest{}.Get(e.Request().Context(), claims.Id, result)
-	if err != nil {
-		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
-	}
-	return utils.ReturnApiSucc(e, http.StatusOK, request)
+	return nil
 }

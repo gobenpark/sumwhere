@@ -174,6 +174,7 @@ func initDB() (*xorm.Engine, error) {
 		new(models.PushHistory),
 		new(models.MatchType),
 		new(models.Country),
+		new(models.MatchHistory),
 	)
 
 	return db, nil
