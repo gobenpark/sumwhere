@@ -39,7 +39,7 @@ func NewFireBaseApp() (AppAdapterInterface, error) {
 	if os.Getenv("RELEASE_SYSTEM") == "kubernetes" {
 		opt = option.WithCredentialsFile("/config/galmal-8f900-firebase-adminsdk-zhjsl-f6d034ad3b.json")
 	} else {
-		opt = option.WithCredentialsFile(dir + "/galmal-8f900-firebase-adminsdk-zhjsl-f6d034ad3b.json")
+		opt = option.WithCredentialsFile(dir + "/kubernetes/galmal-8f900-firebase-adminsdk-zhjsl-f6d034ad3b.json")
 	}
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {

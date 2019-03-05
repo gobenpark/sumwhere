@@ -24,7 +24,7 @@ var (
 
 func init() {
 	runtime.GOMAXPROCS(1)
-	xormEngine, err := xorm.NewEngine("mysql", fmt.Sprintf("%s:%s@tcp(1.215.236.26:30001)/%s", "root", "1q2w3e4r", "sumwhere"))
+	xormEngine, err := xorm.NewEngine("mysql", fmt.Sprintf("%s:%s@tcp(210.100.177.146:33060)/%s", "root", "1q2w3e4r", "sumwhere"))
 	if err != nil {
 		panic(err)
 	}
@@ -58,17 +58,17 @@ func init() {
 		},
 	})
 
-	fb, err := middlewares.NewFireBaseApp()
-	if err != nil {
-		panic(err)
-	}
-
-	firebase := middlewares.ContextFireBase(&fb)
+	//fb, err := middlewares.NewFireBaseApp()
+	//if err != nil {
+	//	panic(err)
+	//}
+	//
+	//firebase := middlewares.ContextFireBase(&fb)
 
 	redisClient := middlewares.ContextRedis(middlewares.ContextSetRedisName, rclient)
 
 	handleWithFilter = func(handlerFunc echo.HandlerFunc, c echo.Context) error {
-		return firebase(redisClient(token(db(handlerFunc))))(c)
+		return redisClient(token(db(handlerFunc)))(c)
 	}
 }
 

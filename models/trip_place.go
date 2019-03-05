@@ -11,8 +11,8 @@ const TOPTRIP = "toptrip"
 const RECENTTOPTRIP = "recenttoptrip"
 
 type CountryJoin struct {
-	Country   `json:"country" xorm:"extends"`
 	TripPlace `json:"tripPlace" xorm:"extends"`
+	Country   `json:"country" xorm:"extends"`
 }
 
 type TripRank struct {
@@ -73,7 +73,7 @@ func (TripPlace) TopTripPlaces(ctx context.Context) ([]TripRank, error) {
 
 func (TripPlace) GetCountryJoind(ctx context.Context) ([]CountryJoin, error) {
 	var jm []CountryJoin
-	err := factory.DB(ctx).Table("trip_place").Join("LEFT", "country", "trip_place.country_id = country.id").Find(&jm)
+	err := factory.DB(ctx).Table("trip_place").Join("INNER", "country", "country.id = trip_place.country_id").Find(&jm)
 	if err != nil {
 		return nil, err
 	}
