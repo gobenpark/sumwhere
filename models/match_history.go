@@ -2,15 +2,14 @@ package models
 
 import (
 	"context"
-	"fmt"
 	"sumwhere/factory"
 	"time"
 )
 
 type joinedModel struct {
-	MatchHistory `json:"matchHistory"`
-	Profile      `json:"profile"`
-	User         `json:"user"`
+	Trip    `json:"trip" xorm:"extends"`
+	User    `json:"user" xorm:"extends"`
+	Profile `json:"profile" xorm:"extends"`
 }
 
 type MatchRequestDTO struct {
@@ -34,6 +33,8 @@ type MatchHistory struct {
 	TripID   int64     `json:"tripId" xorm:"trip_id"`
 	ToUserID int64     `json:"toUserId" xorm:"to_user_id"`
 	ToTripID int64     `json:"toTripId" xorm:"to_trip_id"`
+	Accept   bool      `json:"accept" xorm:"accept default 0"`
+	DeleteAt time.Time `xorm:"deleted"`
 	CreateAt time.Time `json:"createAt" xorm:"created"`
 }
 
@@ -51,14 +52,14 @@ func (MatchHistory) GetRequest(ctx context.Context, userID int64) (*[]joinedMode
 
 	err := factory.DB(ctx).
 		Table("match_history").
-		Join("INNER", "profile", "profile.user_id = match_history.user_id").
+		Join("INNER", "trip", "match_history.trip_id = trip.id").
 		Join("INNER", "user", "match_history.to_user_id = user.id").
+		Join("INNER", "profile", "profile.user_id = match_history.to_user_id").
 		Where("match_history.user_id = ?", userID).
 		Find(&models)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(models)
 
 	return &models, nil
 }

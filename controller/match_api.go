@@ -28,7 +28,7 @@ func (m MatchController) Init(g *echo.Group) {
 	g.GET("/match/type", m.GetMatchTypes)
 	g.GET("/match/totalcount", m.GetTotalCount)
 
-	g.GET("/match/history/receive", m.GetMatchRequestHistory)
+	g.GET("/match/history/request", m.GetMatchRequestHistory)
 
 }
 
@@ -92,6 +92,11 @@ func (MatchController) MatchRequest(e echo.Context) error {
 	historyModel := m.ToModel(claims.Id)
 	if err := historyModel.Insert(e.Request().Context()); err != nil {
 		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
+	}
+
+	push, err := models.Push{}.Get(e.Request().Context(), m.ToUserID)
+	if err == nil {
+		factory.Firebase(e.Request().Context()).SendMessage("", "매칭 요청이 도착했어요!", push.FcmToken)
 	}
 
 	return utils.ReturnApiSucc(e, http.StatusOK, historyModel)

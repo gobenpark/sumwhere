@@ -41,7 +41,7 @@ type Trip struct {
 	EndDate     time.Time `json:"endDate" xorm:"end_date"`
 	CreateAt    time.Time `json:"createAt" xorm:"created"`
 	UpdateAt    time.Time `json:"updateAt" xorm:"updated"`
-	DeleteAt    time.Time `xorm:"deleted"`
+	DeletedAt   time.Time `xorm:"deleted"`
 }
 
 func (t *Trip) Create(ctx context.Context) (int64, error) {
@@ -151,10 +151,10 @@ func (TripUserGroup) Join(ctx context.Context, trip *Trip, count int) (tripGroup
 		"ON trip.id = trip_match_history.trip_id) on user.id = trip.user_id "+
 		"WHERE (trip_match_history.trip_id is null) "+
 		"AND (trip.user_id != %d) "+
-		"AND (user.gender = 'male') "+
+		"AND (trip.trip_place_id = %d)"+
 		"AND (start_date BETWEEN '%s' AND '%s' OR end_date BETWEEN '%s' AND '%s') "+
 		"ORDER BY DATEDIFF(start_date,'%s')"+
-		"limit 0,%d", trip.UserId, startDate, endDate, startDate, endDate, startDate, count)
+		"limit 0,%d", trip.UserId, trip.TripPlaceId, startDate, endDate, startDate, endDate, startDate, count)
 
 	err = factory.DB(ctx).SQL(query).Find(&tripGroup)
 	return
