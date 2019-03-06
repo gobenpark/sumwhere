@@ -147,9 +147,9 @@ func (TripUserGroup) Join(ctx context.Context, trip *Trip, count int) (tripGroup
 	endDate := trip.EndDate.Format("2006-01-02")
 
 	query := fmt.Sprintf("SELECT user.*, trip.* "+
-		"FROM user LEFT JOIN (trip LEFT OUTER JOIN tripmatch_history "+
+		"FROM user LEFT JOIN (trip LEFT OUTER JOIN trip_match_history "+
 		"ON trip.id = trip_match_history.trip_id) on user.id = trip.user_id "+
-		"WHERE (tripmatch_history.trip_id is null) "+
+		"WHERE (trip_match_history.trip_id is null) "+
 		"AND (trip.user_id != %d) "+
 		"AND (user.gender = 'male') "+
 		"AND (start_date BETWEEN '%s' AND '%s' OR end_date BETWEEN '%s' AND '%s') "+
