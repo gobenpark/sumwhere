@@ -2,9 +2,16 @@ package models
 
 import (
 	"context"
+	"fmt"
 	"sumwhere/factory"
 	"time"
 )
+
+type joinedModel struct {
+	MatchHistory `json:"matchHistory"`
+	Profile      `json:"profile"`
+	User         `json:"user"`
+}
 
 type MatchRequestDTO struct {
 	TripID   int64 `json:"tripId" valid:"required"`
@@ -38,6 +45,20 @@ func (m *MatchHistory) Insert(ctx context.Context) error {
 	return nil
 }
 
-func (MatchHistory) GetRequest(ctx context.Context) error {
-	return nil
+func (MatchHistory) GetRequest(ctx context.Context, userID int64) (*[]joinedModel, error) {
+
+	var models []joinedModel
+
+	err := factory.DB(ctx).
+		Table("match_history").
+		Join("INNER", "profile", "profile.user_id = match_history.user_id").
+		Join("INNER", "user", "match_history.to_user_id = user.id").
+		Where("match_history.user_id = ?", userID).
+		Find(&models)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(models)
+
+	return &models, nil
 }

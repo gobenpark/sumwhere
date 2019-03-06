@@ -148,7 +148,7 @@ func (TripUserGroup) Join(ctx context.Context, trip *Trip, count int) (tripGroup
 
 	query := fmt.Sprintf("SELECT user.*, trip.* "+
 		"FROM user LEFT JOIN (trip LEFT OUTER JOIN tripmatch_history "+
-		"ON trip.id = tripmatch_history.trip_id) on user.id = trip.user_id "+
+		"ON trip.id = trip_match_history.trip_id) on user.id = trip.user_id "+
 		"WHERE (tripmatch_history.trip_id is null) "+
 		"AND (trip.user_id != %d) "+
 		"AND (user.gender = 'male') "+
@@ -158,13 +158,4 @@ func (TripUserGroup) Join(ctx context.Context, trip *Trip, count int) (tripGroup
 
 	err = factory.DB(ctx).SQL(query).Find(&tripGroup)
 	return
-}
-
-func (t *TripUserGroup) InsertHistory(ctx context.Context, userID int64) (int64, error) {
-	h := TripmatchHistory{
-		UserId: userID,
-		TripID: t.Trip.Id,
-	}
-
-	return h.Insert(ctx)
 }

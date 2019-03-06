@@ -158,7 +158,6 @@ func initDB() (*xorm.Engine, error) {
 		new(models.TripStyle),
 		new(models.Interest),
 		new(models.Character),
-		new(models.TripmatchHistory),
 		new(models.ChatRoom),
 		new(models.ChatMember),
 		new(models.Banner),
@@ -175,6 +174,7 @@ func initDB() (*xorm.Engine, error) {
 		new(models.MatchType),
 		new(models.Country),
 		new(models.MatchHistory),
+		new(models.TripMatchHistory),
 	)
 
 	return db, nil

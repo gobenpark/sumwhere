@@ -231,6 +231,12 @@ func (MatchController) GetTotalCount(e echo.Context) error {
 }
 
 func (MatchController) GetMatchRequestHistory(e echo.Context) error {
+	users := e.Get("user").(*jwt.Token)
+	claims := users.Claims.(*models.JwtCustomClaims)
 
-	return nil
+	model, err := models.MatchHistory{}.GetRequest(e.Request().Context(), claims.Id)
+	if err != nil {
+		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
+	}
+	return utils.ReturnApiSucc(e, http.StatusOK, model)
 }
