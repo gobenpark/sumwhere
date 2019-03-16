@@ -7,9 +7,10 @@ import (
 )
 
 type joinedModel struct {
-	Trip    `json:"trip" xorm:"extends"`
-	User    `json:"user" xorm:"extends"`
-	Profile `json:"profile" xorm:"extends"`
+	Trip      `json:"trip" xorm:"extends"`
+	TripPlace `json:"tripPlace" xorm:"extends"`
+	User      `json:"user" xorm:"extends"`
+	Profile   `json:"profile" xorm:"extends"`
 }
 
 type MatchRequestDTO struct {
@@ -53,6 +54,7 @@ func (MatchHistory) GetRequest(ctx context.Context, userID int64) (*[]joinedMode
 	err := factory.DB(ctx).
 		Table("match_history").
 		Join("INNER", "trip", "match_history.trip_id = trip.id").
+		Join("INNER", "trip_place", "match_history.trip_place_id = trip_place.id").
 		Join("INNER", "user", "match_history.to_user_id = user.id").
 		Join("INNER", "profile", "profile.user_id = match_history.to_user_id").
 		Where("match_history.user_id = ?", userID).
@@ -61,5 +63,22 @@ func (MatchHistory) GetRequest(ctx context.Context, userID int64) (*[]joinedMode
 		return nil, err
 	}
 
+	return &models, nil
+}
+
+func (MatchHistory) GetReceive(ctx context.Context, userID int64) (*[]joinedModel, error) {
+	var models []joinedModel
+
+	err := factory.DB(ctx).
+		Table("match_history").
+		Join("INNER", "trip", "match_history.trip_id = trip.id").
+		Join("INNER", "trip_place", "match_history.trip_place_id = trip_place.id").
+		Join("INNER", "user", "match_history.to_user_id = user.id").
+		Join("INNER", "profile", "profile.user_id = match_history.to_user_id").
+		Where("match_history.to_user_id = ?", userID).
+		Find(&models)
+	if err != nil {
+		return nil, err
+	}
 	return &models, nil
 }

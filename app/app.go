@@ -137,7 +137,7 @@ func initDB() (*xorm.Engine, error) {
 		url = fmt.Sprintf("%s:%s@tcp(mysql-svc.sumwhere:3306)/%s", dbUser, dbPass, dbName)
 	default:
 		database = "mysql"
-		url = fmt.Sprintf("%s:%s@tcp(210.100.177.146:33060)/%s", "root", "1q2w3e4r", "sumwhere")
+		url = fmt.Sprintf("%s:%s@tcp(192.168.0.192:3306)/%s", "root", "1q2w3e4r", "sumwhere")
 	}
 
 	db, err := xorm.NewEngine(database, url)

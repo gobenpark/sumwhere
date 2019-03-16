@@ -29,6 +29,7 @@ func (m MatchController) Init(g *echo.Group) {
 	g.GET("/match/totalcount", m.GetTotalCount)
 
 	g.GET("/match/history/request", m.GetMatchRequestHistory)
+	g.GET("/match/history/receive", m.GetMatchReceiveHistory)
 
 }
 
@@ -244,4 +245,16 @@ func (MatchController) GetMatchRequestHistory(e echo.Context) error {
 		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
 	}
 	return utils.ReturnApiSucc(e, http.StatusOK, model)
+}
+
+func (MatchController) GetMatchReceiveHistory(e echo.Context) error {
+	users := e.Get("user").(*jwt.Token)
+	claims := users.Claims.(*models.JwtCustomClaims)
+
+	model, err := models.MatchHistory{}.GetReceive(e.Request().Context(), claims.Id)
+	if err != nil {
+		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
+	}
+	return utils.ReturnApiSucc(e, http.StatusOK, model)
+
 }

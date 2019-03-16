@@ -39,8 +39,8 @@ type Trip struct {
 	Activity    string    `json:"activity" xorm:"activity not null"`
 	StartDate   time.Time `json:"startDate" xorm:"start_date"`
 	EndDate     time.Time `json:"endDate" xorm:"end_date"`
-	CreateAt    time.Time `json:"createAt" xorm:"created"`
-	UpdateAt    time.Time `json:"updateAt" xorm:"updated"`
+	CreatedAt   time.Time `json:"createdAt" xorm:"created"`
+	UpdateAt    time.Time `json:"updatedAt" xorm:"updated"`
 	DeletedAt   time.Time `xorm:"deleted"`
 }
 

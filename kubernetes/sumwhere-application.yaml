@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - name: sumwhere-server
-        image: qkrqjadn/sumwhere:latest
+        image: qkrqjadn/sumwhere:1.0.44-c6d036b-20190306
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
