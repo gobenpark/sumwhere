@@ -21,7 +21,7 @@ func (p PushController) Init(g *echo.Group) {
 	//g.GET("/push/id",)
 	g.PUT("/push", p.UpdatePush)
 	g.PUT("/fcmToken", p.FcmTokenUpdate)
-	g.GET("/pushHistory", p.GetHistory)
+	g.GET("/push/history", p.GetHistory)
 }
 
 func (PushController) GetAllPush(e echo.Context) error {
@@ -124,7 +124,13 @@ func (PushController) ChangeSubscribe(ctx context.Context, source models.Push, t
 }
 
 func (PushController) GetHistory(e echo.Context) error {
-	//users := e.Get("user").(*jwt.Token)
-	//claims := users.Claims.(*models.JwtCustomClaims)
-	return nil
+	users := e.Get("user").(*jwt.Token)
+	claims := users.Claims.(*models.JwtCustomClaims)
+
+	history, err := models.PushHistory{}.Get(e.Request().Context(), claims.Id)
+	if err != nil {
+		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
+	}
+
+	return utils.ReturnApiSucc(e, http.StatusOK, history)
 }
