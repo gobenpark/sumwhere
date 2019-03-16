@@ -27,7 +27,7 @@ before_install:
   -in travis_deploy_keys.enc -out ./travis_deploy_keys -d
 - eval "$(ssh-agent -s)"
 - chmod 600 ./travis_deploy_keys
-- echo -e "Host 210.100.177.146\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+- echo -e "Host 121.137.243.163\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 - ssh-add ./travis_deploy_keys
 
 deploy:

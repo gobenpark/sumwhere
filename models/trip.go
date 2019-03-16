@@ -31,7 +31,7 @@ func (TripGroup) TableName() string {
 
 type Trip struct {
 	Id          int64     `json:"id" xorm:"id pk autoincr"`
-	UserId      int64     `json:"userId" xorm:"user_id" valid:"required"`
+	UserId      int64     `json:"userId" xorm:"user_id notnull" valid:"required"`
 	MatchTypeId int64     `json:"matchTypeId" xorm:"match_type_id"`
 	TripPlaceId int64     `json:"tripPlaceId" xorm:"trip_place_id"`
 	GenderType  string    `json:"genderType" xorm:"gender_type VARCHAR(20)"`
