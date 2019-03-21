@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"net/http"
 	"sumwhere/models"

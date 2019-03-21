@@ -36,7 +36,7 @@ type Trip struct {
 	TripPlaceId int64     `json:"tripPlaceId" xorm:"trip_place_id"`
 	GenderType  string    `json:"genderType" xorm:"gender_type VARCHAR(20)"`
 	Region      string    `json:"region" xorm:"region"`
-	Activity    string    `json:"activity" xorm:"activity not null"`
+	Activity    string    `json:"activity" xorm:"activity notnull"`
 	StartDate   time.Time `json:"startDate" xorm:"start_date"`
 	EndDate     time.Time `json:"endDate" xorm:"end_date"`
 	CreatedAt   time.Time `json:"createdAt" xorm:"created"`

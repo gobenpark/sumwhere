@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
@@ -41,6 +41,7 @@ func TestInfomationController_GetEvent(t *testing.T) {
 	}
 
 	require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &v))
+	require.NotEqual(t, 0, len(v.Result))
 	require.Equal(t, true, v.Success)
 }
 

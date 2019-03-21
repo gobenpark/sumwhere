@@ -1,7 +1,8 @@
 package controllers
 
 import (
-	"github.com/labstack/echo"
+	"fmt"
+	"github.com/labstack/echo/v4"
 	"net/http"
 	"sumwhere/models"
 	"sumwhere/utils"
@@ -19,5 +20,6 @@ func (BannerController) GetBanner(e echo.Context) error {
 	if err != nil {
 		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
 	}
+	fmt.Println(banner)
 	return utils.ReturnApiSucc(e, http.StatusOK, banner)
 }

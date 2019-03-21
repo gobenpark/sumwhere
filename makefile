@@ -26,7 +26,7 @@ docker-build:
 	@docker build -t $(IMAGE):$(VERSIONS) .
 
 rolling-update:
-	ssh -i ./travis_deploy_keys root@210.100.177.146 -p 55555 kubectl set image deployment/sumwhere-server sumwhere-server=$(IMAGE):$(VERSIONS) -n sumwhere
+	ssh -i ./travis_deploy_keys root@121.137.243.163 -p 55555 kubectl set image deployment/sumwhere-server sumwhere-server=$(IMAGE):$(VERSIONS) -n sumwhere
 
 push:
 	@echo $(DOCKER_PASSWORD) | docker login -u $(DOCKER_USERNAME) --password-stdin

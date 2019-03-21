@@ -21,5 +21,6 @@ func (Event) GetAll(ctx context.Context) ([]Event, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return e, nil
 }

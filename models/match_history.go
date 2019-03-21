@@ -14,29 +14,32 @@ type joinedModel struct {
 }
 
 type MatchRequestDTO struct {
-	TripID   int64 `json:"tripId" valid:"required"`
-	ToTripID int64 `json:"toTripId" valid:"required"`
-	ToUserID int64 `json:"toUserId" valid:"required"`
+	TripPlaceID int64 `json:"tripPlaceId" valid:"required"`
+	TripID      int64 `json:"tripId" valid:"required"`
+	ToTripID    int64 `json:"toTripId" valid:"required"`
+	ToUserID    int64 `json:"toUserId" valid:"required"`
 }
 
 func (m MatchRequestDTO) ToModel(userID int64) *MatchHistory {
 	return &MatchHistory{
-		UserID:   userID,
-		TripID:   m.TripID,
-		ToUserID: m.ToUserID,
-		ToTripID: m.ToTripID,
+		UserID:      userID,
+		TripPlaceID: m.TripPlaceID,
+		TripID:      m.TripID,
+		ToUserID:    m.ToUserID,
+		ToTripID:    m.ToTripID,
 	}
 }
 
 type MatchHistory struct {
-	ID       int64     `json:"id" xorm:"id pk autoincr"`
-	UserID   int64     `json:"userId" xorm:"user_id"`
-	TripID   int64     `json:"tripId" xorm:"trip_id"`
-	ToUserID int64     `json:"toUserId" xorm:"to_user_id"`
-	ToTripID int64     `json:"toTripId" xorm:"to_trip_id"`
-	Accept   bool      `json:"accept" xorm:"accept default 0"`
-	DeleteAt time.Time `xorm:"deleted"`
-	CreateAt time.Time `json:"createAt" xorm:"created"`
+	ID          int64     `json:"id" xorm:"id pk autoincr"`
+	UserID      int64     `json:"userId" xorm:"user_id"`
+	TripID      int64     `json:"tripId" xorm:"trip_id"`
+	TripPlaceID int64     `json:"tripPlaceId" xorm:"trip_place_id"`
+	ToUserID    int64     `json:"toUserId" xorm:"to_user_id"`
+	ToTripID    int64     `json:"toTripId" xorm:"to_trip_id"`
+	Accept      bool      `json:"accept" xorm:"accept default 0"`
+	DeleteAt    time.Time `xorm:"deleted"`
+	CreateAt    time.Time `json:"createAt" xorm:"created"`
 }
 
 func (m *MatchHistory) Insert(ctx context.Context) error {

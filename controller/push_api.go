@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"net/http"
 	"sumwhere/factory"
@@ -18,7 +18,6 @@ type PushController struct {
 
 func (p PushController) Init(g *echo.Group) {
 	g.GET("/push", p.GetAllPush)
-	//g.GET("/push/id",)
 	g.PUT("/push", p.UpdatePush)
 	g.PUT("/fcmToken", p.FcmTokenUpdate)
 	g.GET("/push/history", p.GetHistory)
@@ -127,10 +126,10 @@ func (PushController) GetHistory(e echo.Context) error {
 	users := e.Get("user").(*jwt.Token)
 	claims := users.Claims.(*models.JwtCustomClaims)
 
-	history, err := models.PushHistory{}.Get(e.Request().Context(), claims.Id)
+	result, err := models.PushHistory{}.Get(e.Request().Context(), claims.Id)
 	if err != nil {
 		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
 	}
 
-	return utils.ReturnApiSucc(e, http.StatusOK, history)
+	return utils.ReturnApiSucc(e, http.StatusOK, result)
 }

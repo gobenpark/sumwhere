@@ -8,8 +8,8 @@ import (
 	"github.com/go-redis/redis"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"os"
 	"os/signal"
@@ -92,7 +92,7 @@ func (s Sumwhere) setMiddleWare() error {
 		return err
 	}
 
-	s.Use(middlewares.ContextFireBase(&fb))
+	s.Use(middlewares.ContextFireBase(fb))
 	s.Use(middlewares.ContextDB("sumwhere", db))
 	s.Use(middlewares.ContextRedis(middlewares.ContextSetRedisName, initSetRedis()))
 	s.Use(middlewares.Logger())
@@ -169,12 +169,12 @@ func initDB() (*xorm.Engine, error) {
 		new(models.Notice),
 		new(models.Report),
 		new(models.ReportType),
-		new(models.Push),
-		new(models.PushHistory),
 		new(models.MatchType),
 		new(models.Country),
 		new(models.MatchHistory),
 		new(models.TripMatchHistory),
+		new(models.Push),
+		new(models.PushHistory),
 		new(models.PushType),
 	)
 

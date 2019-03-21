@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"net/http"
 	"sumwhere/models"
 	"sumwhere/utils"
@@ -28,6 +28,7 @@ func (InfomationController) GetEvent(e echo.Context) error {
 	if err != nil {
 		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
 	}
+
 	return utils.ReturnApiSucc(e, http.StatusOK, model)
 }
 

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
@@ -80,7 +80,7 @@ func (MatchController) MatchRequestCheck(e echo.Context) error {
 func (MatchController) MatchRequest(e echo.Context) error {
 	users := e.Get("user").(*jwt.Token)
 	claims := users.Claims.(*models.JwtCustomClaims)
-
+	factory.Logger(e.Request().Context()).Info("MatchRequest")
 	var m models.MatchRequestDTO
 	if err := e.Bind(&m); err != nil {
 		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorTokenInvaild, err)
@@ -256,5 +256,4 @@ func (MatchController) GetMatchReceiveHistory(e echo.Context) error {
 		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
 	}
 	return utils.ReturnApiSucc(e, http.StatusOK, model)
-
 }
