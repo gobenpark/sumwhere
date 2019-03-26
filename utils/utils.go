@@ -50,6 +50,7 @@ var (
 	ApiErrorKakaoAuth      = ApiError{Code: 30001, Message: "Get Kakao Information does not exists"}
 	ApiErrorFacebookAuth   = ApiError{Code: 30002, Message: "Get Facebook Information does not exists"}
 	ApiErrorNotEnoughPoint = ApiError{Code: 30003, Message: "Not Enough Point"}
+	ApiErrorFirebase       = ApiError{Code: 30004, Message: "Firebase Error"}
 )
 
 func ReturnApiFail(c echo.Context, status int, apiError ApiError, err error, v ...interface{}) error {

@@ -23,6 +23,7 @@ type AppAdapterInterface interface {
 	SetSubscribe(ctx context.Context, isSubscribe bool, token []string, topic string) (int, error)
 	subscribe(ctx context.Context, token []string, topic string) (int, error)
 	unSubscribe(ctx context.Context, token []string, topic string) (int, error)
+	MustMakeChatRoom(ctx context.Context, userID, toUserID int64) error
 }
 
 type FireBaseAppAdapter struct {
@@ -134,4 +135,32 @@ func (f *FireBaseAppAdapter) unSubscribe(ctx context.Context, token []string, to
 		}
 	}
 	return res.SuccessCount, nil
+}
+
+func (f *FireBaseAppAdapter) MustMakeChatRoom(ctx context.Context, userID, toUserID int64) error {
+	client, err := f.app.DatabaseWithURL(ctx, "https://galmal-8f900.firebaseio.com/")
+	if err != nil {
+		return err
+	}
+
+	location := fmt.Sprintf("%d_%d_%s", userID, toUserID, time.Now().UTC().Format("2006-01-02T15:04:05-0700"))
+	user := fmt.Sprintf("%d", userID)
+	toUser := fmt.Sprintf("%d", toUserID)
+
+	err = client.NewRef("conversations").Child(location).Set(ctx, "")
+	if err != nil {
+		return err
+	}
+
+	err = client.NewRef("users").Child(user).Child("conversations").Child(toUser).Child("location").Set(ctx, location)
+	if err != nil {
+		return err
+	}
+
+	err = client.NewRef("users").Child(toUser).Child("conversations").Child(user).Child("location").Set(ctx, location)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

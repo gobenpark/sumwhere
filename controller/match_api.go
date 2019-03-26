@@ -30,7 +30,8 @@ func (m MatchController) Init(g *echo.Group) {
 
 	g.GET("/match/history/request", m.GetMatchRequestHistory)
 	g.GET("/match/history/receive", m.GetMatchReceiveHistory)
-
+	g.PATCH("/match/accept", m.Accept)
+	//g.PATCH("/restrict/match/refuse")
 }
 
 func (MatchController) MatchListFromMysql(e echo.Context, userID int64, trip *models.Trip, count int) ([]models.TripUserGroup, error) {
@@ -255,5 +256,27 @@ func (MatchController) GetMatchReceiveHistory(e echo.Context) error {
 	if err != nil {
 		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
 	}
+	return utils.ReturnApiSucc(e, http.StatusOK, model)
+}
+
+func (MatchController) Accept(e echo.Context) error {
+	id, err := strconv.ParseInt(e.QueryParam("historyID"), 10, 64)
+	if err != nil {
+		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorParameter, err)
+	}
+	model, err := models.MatchHistory{}.StateUpdate(e.Request().Context(), id)
+	if err != nil {
+		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
+	}
+
+	if model.ID == 0 {
+		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorNotFound, errors.New("not exist model"))
+	}
+
+	err = factory.Firebase(e.Request().Context()).MustMakeChatRoom(e.Request().Context(), model.UserID, model.ToUserID)
+	if err != nil {
+		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorFirebase, err)
+	}
+
 	return utils.ReturnApiSucc(e, http.StatusOK, model)
 }
