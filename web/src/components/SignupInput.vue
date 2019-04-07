@@ -1,33 +1,41 @@
 <template>
-    <fieldset class='login-form'>
-        <legend>로그인</legend>
+    <fieldset class='signup-form'>
+        <legend>회원가입</legend>
         <div class='input-wrap'>
-            <input type="text" id="email" v-on:keyup.enter="enter" v-model="email" placeholder="아이디" maxlength="50">
+            <input type="text" id="email" v-on:keyup.enter="enter" v-on:blur="blur" v-model="email" placeholder="아이디" maxlength="50">
             <input type="password" id="password" v-on:keyup.enter="enter" v-model="password" placeholder="비밀번호" maxlength="50">
+            <input type="password" id="passconfirm" v-on:keyup.enter="enter" v-model="passconfirm" placeholder="비밀번호확인" maxlength="50">
         </div>
         <div class='button-wrap'>
-            <button class='submit-btn' v-on:click="submit">로그인</button>
+            <button class='submit-btn' v-on:click="submit">회원가입</button>
         </div>
     </fieldset>
 </template>
 
 <script>
 export default {
-    name: 'LoginInput',
+    name: 'SignupInput',
     data() {
         return {
             email : '',
             password : '',
+            passconfirm : '',
         }   
     },
-    methods: {
+    methods: {        
         enter(e){
             console.log(e.target);
             if(e.target.id == "email"){
                 document.querySelector("#password").focus();
             } else if(e.target.id == "password"){
+                document.querySelector("#passconfirm").focus();
+            } else if(e.target.id == "passconfirm"){
                 this.submit();
+                    
             }
+        },
+        blur(e){
+            console.log(e);
         },
         chkInput(){
             console.log(this);

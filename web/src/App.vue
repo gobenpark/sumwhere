@@ -14,4 +14,10 @@ export default {
   input {
     display: block;
   }
+
+  fieldset{
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
 </style>
