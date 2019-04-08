@@ -41,7 +41,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: static-pv
+  name: public-pv
 spec:
   capacity:
     storage: 800Gi
@@ -54,7 +54,7 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /HDD2/static
+    path: /HDD2/public
     server: master
 
 ---

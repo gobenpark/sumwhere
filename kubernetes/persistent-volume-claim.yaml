@@ -29,7 +29,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: static-pvc
+  name: public-pvc
   namespace: sumwhere
 spec:
   accessModes:

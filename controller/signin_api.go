@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
@@ -14,21 +13,42 @@ import (
 	"sumwhere/utils"
 )
 
+type Token struct {
+	Token string `json:"token" example:"ldifgj1lij31t9gsegl"`
+}
+
 type SignInController struct {
 }
 
 func (c SignInController) Init(g *echo.Group) {
-	g.GET("/email", c.Email)
 	g.POST("/facebook", c.FaceBook)
 	g.POST("/kakao", c.Kakao)
+	g.POST("/email", c.Email)
 }
 
+// ShowAccount godoc
+// @Summary 이메일 가입
+// @Description 이메일을 이용한 가입
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} controllers.Token
+// @Header 200 {string} Token "qwerty"
+// @Router /email [post]
 func (SignInController) Email(e echo.Context) error {
+	var u struct {
+		Email    string `json:"email" valid:"required"`
+		Password string `json:"password" valid:"required"`
+	}
 
-	email := e.FormValue("email")
-	password := e.FormValue("password")
+	if err := e.Bind(&u); err != nil {
+		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorParameter, err)
+	}
 
-	user, err := models.User{}.GetByEmailWithPassword(e.Request().Context(), email, password)
+	if err := e.Validate(&u); err != nil {
+		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorParameter, err)
+	}
+
+	user, err := models.User{}.ValidateEmailLogin(e.Request().Context(), u.Email, u.Password)
 	if user == nil && err != nil {
 		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorDB, err)
 	} else if user == nil && err == nil {
@@ -38,18 +58,22 @@ func (SignInController) Email(e echo.Context) error {
 		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorPassword, err)
 	}
 
-	factory.Logger(e.Request().Context()).
-		WithFields(logrus.Fields{"userInfo": user}).
-		Infoln("Email Login")
-
 	t, err := user.JwtTokenCreate()
 	if err != nil {
 		return utils.ReturnApiFail(e, http.StatusNotAcceptable, utils.ApiErrorDB, err)
 	}
 
-	return utils.ReturnApiSucc(e, http.StatusOK, echo.Map{"token": t})
+	return utils.ReturnApiSucc(e, http.StatusOK, Token{t})
 }
 
+// ShowAccount godoc
+// @Summary 페이스북 가입
+// @Description 페이스북을 이용한 가입
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} Token
+// @Header 200 {string} Token "qwerty"
+// @Router /facebook [post]
 func (SignInController) FaceBook(e echo.Context) error {
 	factory.Logger(e.Request().Context()).Info("FacebookLogin")
 
@@ -72,7 +96,7 @@ func (SignInController) FaceBook(e echo.Context) error {
 	if err != nil {
 		return utils.ReturnApiFail(e, http.StatusNotAcceptable, utils.ApiErrorDB, err)
 	}
-	return utils.ReturnApiSucc(e, http.StatusOK, echo.Map{"token": t})
+	return utils.ReturnApiSucc(e, http.StatusOK, Token{t})
 }
 
 func (SignInController) Kakao(e echo.Context) error {
@@ -83,8 +107,6 @@ func (SignInController) Kakao(e echo.Context) error {
 	if err != nil {
 		return utils.ReturnApiFail(e, http.StatusNotAcceptable, utils.ApiErrorKakaoAuth, err)
 	}
-
-	fmt.Printf("%#v", model)
 
 	// 유저 존재하면 유저반환 없으면 생성후 반환
 	user, err := model.SearchAndCreate(e.Request().Context())
@@ -97,19 +119,28 @@ func (SignInController) Kakao(e echo.Context) error {
 		Infoln("Kakao Login")
 
 	// 토큰반환
-	token, err := user.JwtTokenCreate()
+	t, err := user.JwtTokenCreate()
 	if err != nil {
 		return utils.ReturnApiFail(e, http.StatusNotAcceptable, utils.ApiErrorKakaoAuth, err)
 	}
-	return utils.ReturnApiSucc(e, http.StatusOK, echo.Map{"token": token})
+	return utils.ReturnApiSucc(e, http.StatusOK, Token{t})
 }
 
 func FacebookUtil(c echo.Context) (*models.FaceBookUser, error) {
-	req := c.Request()
-	token := req.PostFormValue("access_token")
+	var token struct {
+		AccessToken string `json:"access_token" valid:"required"`
+	}
+
+	if err := c.Bind(&token); err != nil {
+		return nil, err
+	}
+
+	if err := c.Validate(&token); err != nil {
+		return nil, err
+	}
 
 	url := "https://graph.facebook.com/v3.0/me?fields=id,email,name&access_token="
-	res, err := http.Get(url + token)
+	res, err := http.Get(url + token.AccessToken)
 	defer res.Body.Close()
 	if err != nil {
 		return nil, err
@@ -127,20 +158,31 @@ func FacebookUtil(c echo.Context) (*models.FaceBookUser, error) {
 	if reflect.DeepEqual(facebookuser, models.FaceBookUser{}) {
 		return nil, errors.New("empty facebook model")
 	}
-	facebookuser.Token = token
+	facebookuser.Token = token.AccessToken
 
 	return &facebookuser, nil
 }
 
 func KakaoUtil(c echo.Context) (*models.KakaoUser, error) {
-	req := c.Request()
-	token := req.PostFormValue("access_token")
+
+	var token struct {
+		AccessToken string `json:"access_token" valid:"required"`
+	}
+
+	if err := c.Bind(&token); err != nil {
+		return nil, err
+	}
+
+	if err := c.Validate(&token); err != nil {
+		return nil, err
+	}
+
 	req, err := http.NewRequest("GET", "https://kapi.kakao.com/v2/user/me", nil)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Add("Authorization", "bearer "+token)
+	req.Header.Add("Authorization", "bearer "+token.AccessToken)
 
 	client := &http.Client{}
 	res, err := client.Do(req)
@@ -158,7 +200,7 @@ func KakaoUtil(c echo.Context) (*models.KakaoUser, error) {
 	var kakaoUser models.KakaoUser
 	json.Unmarshal(user, &kakaoUser)
 
-	kakaoUser.Token = token
+	kakaoUser.Token = token.AccessToken
 	if reflect.DeepEqual(kakaoUser, models.KakaoUser{}) {
 		return nil, errors.New("empty kakao model")
 	}

@@ -1,3 +1,4 @@
+//go:generate swag init -g app/app.go
 package app
 
 import (
@@ -11,9 +12,13 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
+	"github.com/swaggo/echo-swagger"
+	"html/template"
+	"io"
 	"os"
 	"os/signal"
 	"sumwhere/controller"
+	_ "sumwhere/docs"
 	"sumwhere/middlewares"
 	"sumwhere/models"
 	"syscall"
@@ -27,6 +32,14 @@ func (v *Validator) Validate(i interface{}) error {
 	return err
 }
 
+type Template struct {
+	templates *template.Template
+}
+
+func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.templates.ExecuteTemplate(w, name, data)
+}
+
 type Sumwhere struct {
 	*echo.Echo
 }
@@ -37,11 +50,27 @@ func NewApp() *Sumwhere {
 	}
 }
 
-func (s Sumwhere) Run() error {
-	v1 := s.Group("/v1")
-	privateV1 := v1.Group("/restrict")
+// @title Sumwhere API
+// @version 2.0
+// @description This is a Sumwhere server API
+// @termsOfService http://swagger.io/terms/
 
-	privateV1.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+// @contact.name API Support
+// @contact.url https://www.sumwhere.kr
+// @contact.email qjadn0914@naver.com
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host www.sumwhere.kr
+// @BasePath /v1
+
+func (s Sumwhere) Run() error {
+	s.GET("/swagger/*", echoSwagger.WrapHandler)
+	v1 := s.Group("/v1")
+	api := v1.Group("/api")
+	privateApi := api.Group("/restrict")
+
+	privateApi.Use(middleware.JWTWithConfig(middleware.JWTConfig{
 		SigningKey: []byte("parkbumwoo"),
 		Claims: &models.JwtCustomClaims{
 			Admin: false,
@@ -55,8 +84,9 @@ func (s Sumwhere) Run() error {
 		return err
 	}
 
-	s.privateController(privateV1)
-	s.publicController(v1)
+	s.renderController(s.Group(""))
+	s.privateApiController(privateApi)
+	s.publicApiController(api)
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGTERM)
@@ -82,6 +112,10 @@ func (s Sumwhere) setMiddleWare() error {
 		break
 	}
 
+	t := &Template{
+		templates: template.Must(template.ParseGlob("public/views/*.html")),
+	}
+
 	db, err := initDB()
 	if err != nil {
 		return err
@@ -92,6 +126,7 @@ func (s Sumwhere) setMiddleWare() error {
 		return err
 	}
 
+	s.Renderer = t
 	s.Use(middlewares.ContextFireBase(fb))
 	s.Use(middlewares.ContextDB("sumwhere", db))
 	s.Use(middlewares.ContextRedis(middlewares.ContextSetRedisName, initSetRedis()))
@@ -100,12 +135,17 @@ func (s Sumwhere) setMiddleWare() error {
 	s.Use(middleware.CORS())
 	s.Use(middleware.RequestID())
 	s.Use(middleware.Recover())
+
 	s.Validator = &Validator{}
-	s.Static("/", "/static/www.sumwhere.kr")
+	s.Static("/", "/public/www.sumwhere.kr")
 	return nil
 }
 
-func (Sumwhere) privateController(e *echo.Group) {
+func (Sumwhere) renderController(e *echo.Group) {
+	controllers.LoginViewController{}.Init(e)
+}
+
+func (Sumwhere) privateApiController(e *echo.Group) {
 	controllers.UserController{}.Init(e)
 	controllers.PurchaseController{}.Init(e)
 	controllers.MatchController{}.Init(e)
@@ -119,7 +159,7 @@ func (Sumwhere) privateController(e *echo.Group) {
 	controllers.MainController{}.Init(e)
 }
 
-func (Sumwhere) publicController(e *echo.Group) {
+func (Sumwhere) publicApiController(e *echo.Group) {
 	controllers.SignUpController{}.Init(e.Group("/signup"))
 	controllers.SignInController{}.Init(e.Group("/signin"))
 }

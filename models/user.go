@@ -3,7 +3,6 @@ package models
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
@@ -151,15 +150,14 @@ func (UserWithProfile) GetUserWithProfile(ctx context.Context, id int64) (*UserW
 	return &userWithProfile, nil
 }
 
-func (User) GetByEmailWithPassword(ctx context.Context, email, password string) (*User, error) {
+func (User) ValidateEmailLogin(ctx context.Context, email, password string) (*User, error) {
 	var u User
-	has, err := factory.DB(ctx).Where("email = ? AND join_type = ?", email, "EMAIL").Get(&u)
+	has, err := factory.DB(ctx).Where("email = ?", email).And("join_type = ?", "EMAIL").Get(&u)
 	if err != nil {
 		return nil, err
 	}
 
 	if !has {
-		fmt.Println("this")
 		return nil, nil
 	}
 

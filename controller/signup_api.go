@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
 	"net/http"
 	"sumwhere/models"
 	"sumwhere/utils"
@@ -35,7 +34,6 @@ func (SignUpController) Email(e echo.Context) error {
 		return utils.ReturnApiFail(e, http.StatusNotAcceptable, utils.ApiErrorDB, err)
 	}
 
-	log.Info(u.Id)
 	t, err := u.JwtTokenCreate()
 	if err != nil {
 		return utils.ReturnApiFail(e, http.StatusNotAcceptable, utils.ApiErrorDB, err)
