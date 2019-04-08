@@ -14,7 +14,7 @@ import (
 )
 
 type Token struct {
-	Token string `json:"token" example:"ldifgj1lij31t9gsegl"`
+	AccessToken string `json:"access_token" valid:"required" example:"ldifgj1lij31t9gsegl"`
 }
 
 type SignInController struct {
@@ -27,13 +27,14 @@ func (c SignInController) Init(g *echo.Group) {
 }
 
 // ShowAccount godoc
-// @Summary 이메일 가입
-// @Description 이메일을 이용한 가입
+// @Summary 이메일 로그인
+// @tags signin
+// @Description 이메일을 이용한 로그인
+// @Param user body models.User true "email 과 passward만 쓸것"
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} controllers.Token
-// @Header 200 {string} Token "qwerty"
-// @Router /email [post]
+// @Success 200 {object} controllers.Token "access 토큰을 반환"
+// @Router /signin/email [post]
 func (SignInController) Email(e echo.Context) error {
 	var u struct {
 		Email    string `json:"email" valid:"required"`
@@ -66,14 +67,15 @@ func (SignInController) Email(e echo.Context) error {
 	return utils.ReturnApiSucc(e, http.StatusOK, Token{t})
 }
 
-// ShowAccount godoc
-// @Summary 페이스북 가입
-// @Description 페이스북을 이용한 가입
+// signinfacebook godoc
+// @Summary 페이스북 로그인
+// @tags signin
+// @Param token body controllers.Token true "토큰 전송 "
+// @Description 페이스북을 이용한 로그인
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} Token
-// @Header 200 {string} Token "qwerty"
-// @Router /facebook [post]
+// @Success 200 {object} controllers.Token "access 토큰을 반환"
+// @Router /signin/facebook [post]
 func (SignInController) FaceBook(e echo.Context) error {
 	factory.Logger(e.Request().Context()).Info("FacebookLogin")
 
@@ -99,6 +101,16 @@ func (SignInController) FaceBook(e echo.Context) error {
 	return utils.ReturnApiSucc(e, http.StatusOK, Token{t})
 }
 
+// signinkakao godoc
+// @Summary kakao 로그인
+// @tags signin
+// @Param token body controllers.Token true "토큰 전송 "
+// @Description 카카오를 이용한 로그인
+// @Accept  json
+// @Param token body controllers.Token true "Bottle ID"
+// @Produce  json
+// @Success 200 {object} controllers.Token "access 토큰을 반환"
+// @Router /signin/kakao [post]
 func (SignInController) Kakao(e echo.Context) error {
 	factory.Logger(e.Request().Context()).Info("KakaoLogin")
 
@@ -127,9 +139,7 @@ func (SignInController) Kakao(e echo.Context) error {
 }
 
 func FacebookUtil(c echo.Context) (*models.FaceBookUser, error) {
-	var token struct {
-		AccessToken string `json:"access_token" valid:"required"`
-	}
+	var token Token
 
 	if err := c.Bind(&token); err != nil {
 		return nil, err
@@ -165,9 +175,7 @@ func FacebookUtil(c echo.Context) (*models.FaceBookUser, error) {
 
 func KakaoUtil(c echo.Context) (*models.KakaoUser, error) {
 
-	var token struct {
-		AccessToken string `json:"access_token" valid:"required"`
-	}
+	var token Token
 
 	if err := c.Bind(&token); err != nil {
 		return nil, err

@@ -9,8 +9,8 @@ import (
 )
 
 type ApiResult struct {
-	Result  interface{} `json:"result"`
-	Success bool        `json:"success"`
+	Result  interface{} `json:"result" extensions:"x-nullable,x-abc=def"`
+	Success bool        `json:"success" example:"true"`
 	Error   ApiError    `json:"error"`
 }
 

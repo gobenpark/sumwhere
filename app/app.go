@@ -1,4 +1,3 @@
-//go:generate swag init -g app/app.go
 package app
 
 import (
@@ -63,6 +62,7 @@ func NewApp() *Sumwhere {
 
 // @host www.sumwhere.kr
 // @BasePath /v1
+// @schemes https
 
 func (s Sumwhere) Run() error {
 	s.GET("/swagger/*", echoSwagger.WrapHandler)

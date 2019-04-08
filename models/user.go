@@ -23,8 +23,8 @@ func (UserWithProfile) TableName() string {
 type (
 	User struct {
 		Id               int64     `json:"id" xorm:"'id' pk autoincr"`
-		Email            string    `json:"email" xorm:"varchar(50)" valid:"email"`
-		Password         string    `json:"password" valid:"required"`
+		Email            string    `json:"email" xorm:"varchar(50)" valid:"email" example:"example@naver.com"`
+		Password         string    `json:"password" valid:"required" example:"1234qwer"`
 		Username         string    `json:"username" xorm:"username"`
 		Gender           string    `json:"gender"`
 		Age              int       `json:"age" xorm:"age"`
