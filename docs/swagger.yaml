@@ -1,0 +1,182 @@
+basePath: /v1
+definitions:
+  controllers.Token:
+    properties:
+      access_token:
+        example: ldifgj1lij31t9gsegl
+        type: string
+    type: object
+  models.User:
+    properties:
+      age:
+        type: integer
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      email:
+        example: example@naver.com
+        type: string
+      gender:
+        type: string
+      hasProfile:
+        type: boolean
+      id:
+        type: integer
+      is_admin:
+        type: boolean
+      joinType:
+        type: string
+      mainProfileImage:
+        type: string
+      nickname:
+        type: string
+      password:
+        example: 1234qwer
+        type: string
+      point:
+        type: integer
+      snsId:
+        type: string
+      token:
+        type: string
+      updatedAt:
+        type: string
+      username:
+        type: string
+    type: object
+host: www.sumwhere.kr
+info:
+  contact:
+    email: qjadn0914@naver.com
+    name: API Support
+    url: https://www.sumwhere.kr
+  description: This is a Sumwhere server API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Sumwhere API
+  version: "2.0"
+paths:
+  /signin/email:
+    post:
+      consumes:
+      - application/json
+      description: 이메일을 이용한 로그인
+      parameters:
+      - description: email 과 passward만 쓸것
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: access 토큰을 반환
+          schema:
+            $ref: '#/definitions/controllers.Token'
+            type: object
+      summary: 이메일 로그인
+      tags:
+      - signin
+  /signin/facebook:
+    post:
+      consumes:
+      - application/json
+      description: 페이스북을 이용한 로그인
+      parameters:
+      - description: '토큰 전송 '
+        in: body
+        name: token
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.Token'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: access 토큰을 반환
+          schema:
+            $ref: '#/definitions/controllers.Token'
+            type: object
+      summary: 페이스북 로그인
+      tags:
+      - signin
+  /signin/kakao:
+    post:
+      consumes:
+      - application/json
+      description: 카카오를 이용한 로그인
+      parameters:
+      - description: '토큰 전송 '
+        in: body
+        name: token
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.Token'
+          type: object
+      - description: Bottle ID
+        in: body
+        name: token
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.Token'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: access 토큰을 반환
+          schema:
+            $ref: '#/definitions/controllers.Token'
+            type: object
+      summary: kakao 로그인
+      tags:
+      - signin
+  /signup/email:
+    post:
+      consumes:
+      - application/json
+      description: 이메일을 이용한 가입
+      parameters:
+      - description: email 과 passward만 쓸것
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: access 토큰을 반환
+          schema:
+            $ref: '#/definitions/controllers.Token'
+            type: object
+      summary: 이메일 가입
+      tags:
+      - signup
+  /signup/nickname:
+    get:
+      consumes:
+      - application/json
+      description: 닉네임이 존재하는지 확인
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: bool 타입의 결과 있으면 true 없으면 false
+          schema:
+            type: boolean
+      summary: 닉네임 확인
+      tags:
+      - signup
+schemes:
+- https
+swagger: "2.0"

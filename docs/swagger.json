@@ -1,0 +1,271 @@
+{
+    "schemes": [
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a Sumwhere server API",
+        "title": "Sumwhere API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "https://www.sumwhere.kr",
+            "email": "qjadn0914@naver.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "2.0"
+    },
+    "host": "www.sumwhere.kr",
+    "basePath": "/v1",
+    "paths": {
+        "/signin/email": {
+            "post": {
+                "description": "이메일을 이용한 로그인",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "signin"
+                ],
+                "summary": "이메일 로그인",
+                "parameters": [
+                    {
+                        "description": "email 과 passward만 쓸것",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "access 토큰을 반환",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controllers.Token"
+                        }
+                    }
+                }
+            }
+        },
+        "/signin/facebook": {
+            "post": {
+                "description": "페이스북을 이용한 로그인",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "signin"
+                ],
+                "summary": "페이스북 로그인",
+                "parameters": [
+                    {
+                        "description": "토큰 전송 ",
+                        "name": "token",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controllers.Token"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "access 토큰을 반환",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controllers.Token"
+                        }
+                    }
+                }
+            }
+        },
+        "/signin/kakao": {
+            "post": {
+                "description": "카카오를 이용한 로그인",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "signin"
+                ],
+                "summary": "kakao 로그인",
+                "parameters": [
+                    {
+                        "description": "토큰 전송 ",
+                        "name": "token",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controllers.Token"
+                        }
+                    },
+                    {
+                        "description": "Bottle ID",
+                        "name": "token",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controllers.Token"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "access 토큰을 반환",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controllers.Token"
+                        }
+                    }
+                }
+            }
+        },
+        "/signup/email": {
+            "post": {
+                "description": "이메일을 이용한 가입",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "signup"
+                ],
+                "summary": "이메일 가입",
+                "parameters": [
+                    {
+                        "description": "email 과 passward만 쓸것",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "access 토큰을 반환",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controllers.Token"
+                        }
+                    }
+                }
+            }
+        },
+        "/signup/nickname": {
+            "get": {
+                "description": "닉네임이 존재하는지 확인",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "signup"
+                ],
+                "summary": "닉네임 확인",
+                "responses": {
+                    "200": {
+                        "description": "bool 타입의 결과 있으면 true 없으면 false",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "controllers.Token": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string",
+                    "example": "ldifgj1lij31t9gsegl"
+                }
+            }
+        },
+        "models.User": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "example@naver.com"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "hasProfile": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_admin": {
+                    "type": "boolean"
+                },
+                "joinType": {
+                    "type": "string"
+                },
+                "mainProfileImage": {
+                    "type": "string"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "1234qwer"
+                },
+                "point": {
+                    "type": "integer"
+                },
+                "snsId": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

@@ -63,7 +63,6 @@ func NewApp() *Sumwhere {
 // @host www.sumwhere.kr
 // @BasePath /v1
 // @schemes https
-
 func (s Sumwhere) Run() error {
 	s.GET("/swagger/*", echoSwagger.WrapHandler)
 	v1 := s.Group("/v1")
