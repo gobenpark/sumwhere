@@ -62,7 +62,7 @@ func NewApp() *Sumwhere {
 
 // @host www.sumwhere.kr
 // @BasePath /v1
-// @schemes https
+// @schemes https http
 func (s Sumwhere) Run() error {
 	s.GET("/swagger/*", echoSwagger.WrapHandler)
 	v1 := s.Group("/v1")
@@ -156,6 +156,7 @@ func (Sumwhere) privateApiController(e *echo.Group) {
 	controllers.BannerController{}.Init(e)
 	controllers.PushController{}.Init(e)
 	controllers.MainController{}.Init(e)
+	controllers.AdminController{}.Init(e)
 }
 
 func (Sumwhere) publicApiController(e *echo.Group) {
@@ -176,7 +177,7 @@ func initDB() (*xorm.Engine, error) {
 		url = fmt.Sprintf("%s:%s@tcp(mysql-svc.sumwhere:3306)/%s", dbUser, dbPass, dbName)
 	default:
 		database = "mysql"
-		url = fmt.Sprintf("%s:%s@tcp(192.168.0.192:3306)/%s", "root", "1q2w3e4r", "sumwhere")
+		url = fmt.Sprintf("%s:%s@tcp(localhost:3306)/%s", "root", "1q2w3e4r", "sumwhere")
 	}
 
 	db, err := xorm.NewEngine(database, url)

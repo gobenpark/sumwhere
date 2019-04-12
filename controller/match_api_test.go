@@ -15,7 +15,7 @@ func TestMatchController_GetTotalCount(t *testing.T) {
 	rec := httptest.NewRecorder()
 	ctx := echoApp.NewContext(req, rec)
 
-	require.NoError(t, handleWithFilter(MatchController{}.GetTotalCount, ctx))
+	require.NoError(t, restrictHandleWithFilter(MatchController{}.GetTotalCount, ctx))
 	require.Equal(t, http.StatusOK, rec.Code)
 
 	var v struct {
@@ -33,7 +33,7 @@ func TestMatchController_GetMatchRequestHistory(t *testing.T) {
 	rec := httptest.NewRecorder()
 	ctx := echoApp.NewContext(req, rec)
 
-	require.NoError(t, handleWithFilter(MatchController{}.GetMatchRequestHistory, ctx))
+	require.NoError(t, restrictHandleWithFilter(MatchController{}.GetMatchRequestHistory, ctx))
 	require.Equal(t, http.StatusOK, rec.Code)
 
 	var v struct {
@@ -50,7 +50,7 @@ func TestMatchController_GetMatchReceiveHistory(t *testing.T) {
 	rec := httptest.NewRecorder()
 	ctx := echoApp.NewContext(req, rec)
 
-	require.NoError(t, handleWithFilter(MatchController{}.GetMatchReceiveHistory, ctx))
+	require.NoError(t, restrictHandleWithFilter(MatchController{}.GetMatchReceiveHistory, ctx))
 	require.Equal(t, http.StatusOK, rec.Code)
 
 	var v struct {

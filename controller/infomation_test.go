@@ -15,7 +15,7 @@ import (
 //	req.Header.Set(echo.HeaderAuthorization, TOKEN)
 //	rec := httptest.NewRecorder()
 //	ctx := echoApp.NewContext(req, rec)
-//	assert.NoError(t, handleWithFilter(InfomationController{}.GetAdvertisement, ctx))
+//	assert.NoError(t, restrictHandleWithFilter(InfomationController{}.GetAdvertisement, ctx))
 //	assert.Equal(t, http.StatusOK, rec.Code)
 //
 //	var v struct {
@@ -32,7 +32,7 @@ func TestInfomationController_GetEvent(t *testing.T) {
 	req.Header.Set(echo.HeaderAuthorization, TOKEN)
 	rec := httptest.NewRecorder()
 	ctx := echoApp.NewContext(req, rec)
-	require.NoError(t, handleWithFilter(InfomationController{}.GetEvent, ctx))
+	require.NoError(t, restrictHandleWithFilter(InfomationController{}.GetEvent, ctx))
 	require.Equal(t, http.StatusOK, rec.Code)
 
 	var v struct {
@@ -50,7 +50,7 @@ func TestInfomationController_GetNotice(t *testing.T) {
 	req.Header.Set(echo.HeaderAuthorization, TOKEN)
 	rec := httptest.NewRecorder()
 	ctx := echoApp.NewContext(req, rec)
-	require.NoError(t, handleWithFilter(InfomationController{}.GetNotice, ctx))
+	require.NoError(t, restrictHandleWithFilter(InfomationController{}.GetNotice, ctx))
 	require.Equal(t, http.StatusOK, rec.Code)
 
 	var v struct {

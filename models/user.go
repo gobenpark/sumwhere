@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/go-xorm/xorm"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 	"strconv"
 	"sumwhere/factory"
+	"sumwhere/utils"
 	"time"
 )
 
@@ -41,6 +43,44 @@ type (
 		DeletedAt        time.Time `xorm:"deleted"`
 	}
 )
+
+func (User) GetAll(ctx context.Context, sortby, order []string, offset, limit int) (totalCount int64, items []User, err error) {
+	queryBuilder := func() xorm.Interface {
+		q := factory.DB(ctx)
+		if err := utils.SetSortOrder(q, sortby, order); err != nil {
+			factory.Logger(ctx).Error(err)
+		}
+		return q
+	}
+
+	errc := make(chan error)
+	go func() {
+		v, err := queryBuilder().Count(&User{})
+		if err != nil {
+			errc <- err
+			return
+		}
+		totalCount = v
+		errc <- nil
+
+	}()
+
+	go func() {
+		if err := queryBuilder().Limit(limit, offset).Find(&items); err != nil {
+			errc <- err
+			return
+		}
+		errc <- nil
+	}()
+
+	if err := <-errc; err != nil {
+		return 0, nil, err
+	}
+	if err := <-errc; err != nil {
+		return 0, nil, err
+	}
+	return
+}
 
 func (u *User) CheckDuplicate(ctx context.Context) error {
 	result, err := factory.DB(ctx).Where("email = ?", u.Email).And("join_type = ?", u.JoinType).Count(User{})
@@ -79,7 +119,7 @@ func (u *User) Create(ctx context.Context) (int64, error) {
 }
 
 func (u *User) Update(ctx context.Context) (int64, error) {
-	return factory.DB(ctx).ID(u.Id).UseBool("has_profile").Update(u)
+	return factory.DB(ctx).ID(u.Id).UseBool("has_profile", "admin").Update(u)
 }
 
 func (u *User) Delete(ctx context.Context) (int64, error) {

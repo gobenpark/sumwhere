@@ -23,7 +23,7 @@ func TestTripController_Update(t *testing.T) {
 	ctx := echoApp.NewContext(req, rec)
 	ctx.SetParamNames("id")
 	ctx.SetParamValues("57")
-	assert.NoError(t, handleWithFilter(TripController{}.Update, ctx))
+	assert.NoError(t, restrictHandleWithFilter(TripController{}.Update, ctx))
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 	var v struct {
@@ -42,7 +42,7 @@ func TestTripController_GetTripPlace(t *testing.T) {
 	ctx := echoApp.NewContext(req, rec)
 	ctx.SetParamNames("countryid")
 	ctx.SetParamValues("1")
-	assert.NoError(t, handleWithFilter(TripController{}.GetTripPlace, ctx))
+	assert.NoError(t, restrictHandleWithFilter(TripController{}.GetTripPlace, ctx))
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 	var v struct {
@@ -59,7 +59,7 @@ func TestTripController_GetTripCountry(t *testing.T) {
 	req.Header.Set(echo.HeaderAuthorization, TOKEN)
 	rec := httptest.NewRecorder()
 	ctx := echoApp.NewContext(req, rec)
-	assert.NoError(t, handleWithFilter(TripController{}.GetTripCountry, ctx))
+	assert.NoError(t, restrictHandleWithFilter(TripController{}.GetTripCountry, ctx))
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 	var v struct {
@@ -76,6 +76,6 @@ func TestTripController_GetTripStyles(t *testing.T) {
 	rec := httptest.NewRecorder()
 	ctx := echoApp.NewContext(req, rec)
 
-	assert.NoError(t, handleWithFilter(TripController{}.GetTripStyles, ctx))
+	assert.NoError(t, restrictHandleWithFilter(TripController{}.GetTripStyles, ctx))
 	assert.Equal(t, http.StatusOK, rec.Code)
 }

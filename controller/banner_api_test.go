@@ -17,7 +17,7 @@ func TestBannerController_GetBanner(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	ctx := echoApp.NewContext(req, rec)
-	assert.NoError(t, handleWithFilter(BannerController{}.GetBanner, ctx))
+	assert.NoError(t, restrictHandleWithFilter(BannerController{}.GetBanner, ctx))
 	assert.Equal(t, http.StatusOK, rec.Code)
 	t.Log(rec.Body)
 

@@ -1,10 +1,33 @@
 basePath: /v1
 definitions:
+  controllers.AdminController:
+    type: object
   controllers.Token:
     properties:
       access_token:
         example: ldifgj1lij31t9gsegl
         type: string
+    type: object
+  models.GetQuery:
+    properties:
+      limit:
+        example: 2
+        type: integer
+      offset:
+        example: 1
+        type: integer
+      orderBy:
+        example:
+        - desc
+        items:
+          type: string
+        type: array
+      sortBy:
+        example:
+        - email
+        items:
+          type: string
+        type: array
     type: object
   models.User:
     properties:
@@ -45,6 +68,13 @@ definitions:
       username:
         type: string
     type: object
+  utils.ArrayResult:
+    properties:
+      items:
+        type: object
+      totalCount:
+        type: integer
+    type: object
 host: www.sumwhere.kr
 info:
   contact:
@@ -59,6 +89,29 @@ info:
   title: Sumwhere API
   version: "2.0"
 paths:
+  /admin/assgin:
+    patch:
+      consumes:
+      - application/json
+      description: 기존 어드민사용자가 추가로 어드민 권한을 유저에게 ≠부여
+      parameters:
+      - description: '{''id'':1}'
+        in: body
+        name: id
+        schema:
+          $ref: '#/definitions/controllers.AdminController'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 해당 유저정보
+          schema:
+            $ref: '#/definitions/models.User'
+            type: object
+      summary: 어드민 권한 부여
+      tags:
+      - admin
   /signin/email:
     post:
       consumes:
@@ -177,6 +230,30 @@ paths:
       summary: 닉네임 확인
       tags:
       - signup
+  /user/all:
+    get:
+      consumes:
+      - application/json
+      description: 가입자 리스트 반환
+      parameters:
+      - description: 순서,순서마다의 정렬순서 (desc|asc), 어디서부터, 몇개를 가져올지
+        in: body
+        name: query
+        required: true
+        schema:
+          $ref: '#/definitions/models.GetQuery'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 쿼리의 결과
+          schema:
+            $ref: '#/definitions/utils.ArrayResult'
+            type: object
+      summary: 유저 리스트 반환
+      tags:
+      - user
 schemes:
 - https
 swagger: "2.0"

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -21,9 +20,9 @@ type UserController struct {
 }
 
 func (u UserController) Init(g *echo.Group) {
-	g.GET("/login", u.Login)
 	g.GET("/existProfile", u.ExistProfile)
 	g.GET("/user", u.GetUser)
+	g.GET("/user/all", u.All)
 	g.GET("/another_user", u.GetById)
 	g.GET("/user_with_profile", u.GetUserWithProfile)
 	g.POST("/profile", u.CreateProfile)
@@ -31,13 +30,36 @@ func (u UserController) Init(g *echo.Group) {
 	g.DELETE("/signout", u.SignOut)
 }
 
-func (UserController) Login(e echo.Context) error {
-	user, err := models.User{}.GetUserByJWT(e)
-	if err != nil {
-		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorUserNotExists, err)
+// UserController godoc
+// @Summary 유저 리스트 반환
+// @tags user
+// @Description 가입자 리스트 반환
+// @Param query body models.GetQuery true "순서,순서마다의 정렬순서 (desc|asc), 어디서부터, 몇개를 가져올지"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} utils.ArrayResult "쿼리의 결과"
+// @Router /user/all [get]
+func (UserController) All(e echo.Context) error {
+
+	var i models.GetQuery
+
+	if err := e.Bind(&i); err != nil {
+		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorParameter, err)
 	}
-	factory.Logger(e.Request().Context()).WithFields(logrus.Fields{"userInfo": user}).Infoln("userLogin")
-	return utils.ReturnApiSucc(e, http.StatusOK, true)
+
+	if err := e.Validate(&i); err != nil {
+		return utils.ReturnApiFail(e, http.StatusBadRequest, utils.ApiErrorParameter, err)
+	}
+
+	count, item, err := models.User{}.GetAll(e.Request().Context(), i.SortBy, i.OrderBy, i.Offset, i.Limit)
+	if err != nil {
+		return utils.ReturnApiFail(e, http.StatusInternalServerError, utils.ApiErrorDB, err)
+	}
+
+	return utils.ReturnApiSucc(e, http.StatusOK, utils.ArrayResult{
+		Items:      item,
+		TotalCount: count,
+	})
 }
 
 func (UserController) ExistProfile(e echo.Context) error {

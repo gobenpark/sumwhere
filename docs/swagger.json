@@ -21,6 +21,41 @@
     "host": "www.sumwhere.kr",
     "basePath": "/v1",
     "paths": {
+        "/admin/assgin": {
+            "patch": {
+                "description": "기존 어드민사용자가 추가로 어드민 권한을 유저에게 ≠부여",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "어드민 권한 부여",
+                "parameters": [
+                    {
+                        "description": "{'id':1}",
+                        "name": "id",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controllers.AdminController"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "해당 유저정보",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                }
+            }
+        },
         "/signin/email": {
             "post": {
                 "description": "이메일을 이용한 로그인",
@@ -197,15 +232,85 @@
                     }
                 }
             }
+        },
+        "/user/all": {
+            "get": {
+                "description": "가입자 리스트 반환",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "유저 리스트 반환",
+                "parameters": [
+                    {
+                        "description": "순서,순서마다의 정렬순서 (desc|asc), 어디서부터, 몇개를 가져올지",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.GetQuery"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "쿼리의 결과",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/utils.ArrayResult"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "controllers.AdminController": {
+            "type": "object"
+        },
         "controllers.Token": {
             "type": "object",
             "properties": {
                 "access_token": {
                     "type": "string",
                     "example": "ldifgj1lij31t9gsegl"
+                }
+            }
+        },
+        "models.GetQuery": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "offset": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "orderBy": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "desc"
+                    ]
+                },
+                "sortBy": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "email"
+                    ]
                 }
             }
         },
@@ -264,6 +369,17 @@
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "utils.ArrayResult": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "object"
+                },
+                "totalCount": {
+                    "type": "integer"
                 }
             }
         }

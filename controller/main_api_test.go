@@ -15,7 +15,7 @@ func TestMainController_TopTrip(t *testing.T) {
 	req.Header.Set(echo.HeaderAuthorization, TOKEN)
 	rec := httptest.NewRecorder()
 	ctx := echoApp.NewContext(req, rec)
-	assert.NoError(t, handleWithFilter(MainController{}.TopTrip, ctx))
+	assert.NoError(t, restrictHandleWithFilter(MainController{}.TopTrip, ctx))
 
 	var v struct {
 		Result  models.TripPlace `json:"result"`
