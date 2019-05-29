@@ -12,14 +12,13 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/swaggo/echo-swagger"
-	"html/template"
-	"io"
 	"os"
 	"os/signal"
 	"sumwhere/controller"
 	_ "sumwhere/docs"
 	"sumwhere/middlewares"
 	"sumwhere/models"
+	"sumwhere/utils"
 	"syscall"
 	"time"
 )
@@ -31,19 +30,12 @@ func (v *Validator) Validate(i interface{}) error {
 	return err
 }
 
-type Template struct {
-	templates *template.Template
-}
-
-func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.ExecuteTemplate(w, name, data)
-}
-
 type Sumwhere struct {
 	*echo.Echo
 }
 
 func NewApp() *Sumwhere {
+
 	return &Sumwhere{
 		Echo: echo.New(),
 	}
@@ -83,7 +75,6 @@ func (s Sumwhere) Run() error {
 		return err
 	}
 
-	s.renderController(s.Group(""))
 	s.privateApiController(privateApi)
 	s.publicApiController(api)
 
@@ -111,10 +102,6 @@ func (s Sumwhere) setMiddleWare() error {
 		break
 	}
 
-	t := &Template{
-		templates: template.Must(template.ParseGlob("public/views/*.html")),
-	}
-
 	db, err := initDB()
 	if err != nil {
 		return err
@@ -125,7 +112,6 @@ func (s Sumwhere) setMiddleWare() error {
 		return err
 	}
 
-	s.Renderer = t
 	s.Use(middlewares.ContextFireBase(fb))
 	s.Use(middlewares.ContextDB("sumwhere", db))
 	s.Use(middlewares.ContextRedis(middlewares.ContextSetRedisName, initSetRedis()))
@@ -138,10 +124,6 @@ func (s Sumwhere) setMiddleWare() error {
 	s.Validator = &Validator{}
 	s.Static("/", "/public/www.sumwhere.kr")
 	return nil
-}
-
-func (Sumwhere) renderController(e *echo.Group) {
-	controllers.LoginViewController{}.Init(e)
 }
 
 func (Sumwhere) privateApiController(e *echo.Group) {
@@ -167,26 +149,23 @@ func (Sumwhere) publicApiController(e *echo.Group) {
 func initDB() (*xorm.Engine, error) {
 
 	var url string
-	dbUser := os.Getenv("DATABASE_USER")
-	database := os.Getenv("DATABASE_DRIVER")
-	dbPass := os.Getenv("DATABASE_PASS")
-	dbName := os.Getenv("DATABASE_NAME")
+	dbUser := utils.DefaultEnv("DATABASE_USER", "root")
+	database := utils.DefaultEnv("DATABASE_DRIVER", "mysql")
+	dbPass := utils.DefaultEnv("DATABASE_PASS", "1q2w3e4r")
+	dbName := utils.DefaultEnv("DATABASE_NAME", "sumwhere")
+
+	db, err := xorm.NewEngine(database, url)
+
+	if err != nil {
+		return nil, err
+	}
 
 	switch os.Getenv("RELEASE_SYSTEM") {
 	case "kubernetes":
 		url = fmt.Sprintf("%s:%s@tcp(mysql-svc.sumwhere:3306)/%s", dbUser, dbPass, dbName)
 	default:
-		database = "mysql"
-		url = fmt.Sprintf("%s:%s@tcp(localhost:3306)/%s", "root", "1q2w3e4r", "sumwhere")
-	}
-
-	db, err := xorm.NewEngine(database, url)
-	if err != nil {
-		return nil, err
-	}
-
-	if os.Getenv("RELEASE_SYSTEM") != "kubernetes" {
 		db.ShowSQL(true)
+		url = fmt.Sprintf("%s:%s@tcp(localhost:3306)/%s", "root", "1q2w3e4r", "sumwhere")
 	}
 
 	_ = db.Sync2(
